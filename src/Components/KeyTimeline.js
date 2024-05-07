@@ -10,15 +10,16 @@ function KeyTimeline({
 	onBeatClick,
 	width,
 	rowHeight,
+	midiNotes,
+	setMidiNotes,
 	penModeActivated = false,
 }) {
 	//dictionary from start time to end time of midi
-	const [midiNotes, setMidiNotes] = useState({});
+	// const [midiNotes, setMidiNotes] = useState({});
 
 	const [blackKey, setBlackKey] = useState(false);
 
 	// TODO:
-	// - line divisions up top
 	// - playback
 	// - click and drag.
 
@@ -42,6 +43,7 @@ function KeyTimeline({
 		}
 	};
 
+	// todo
 	const addBeatAndClearSpaceAsNecessary = (index) => {
 		const startOfBeat = index / numBeats;
 		const endOfBeat = (index + 1) / numBeats;

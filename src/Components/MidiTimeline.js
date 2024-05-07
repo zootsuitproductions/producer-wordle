@@ -4,6 +4,8 @@ import "../App.css";
 import KeyTimeline from "./KeyTimeline";
 import TopOfTimeline from "./TopOfTimeline";
 
+const sound = new Audio("cc kick.wav");
+
 function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 	const MAX_LEFT = leftSidePosition;
 	const MIN_RIGHT = MAX_LEFT + minWidth;
@@ -13,7 +15,49 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 	const [timeDivision, setTimeDivision] = useState(32);
 	const [penModeActivated, setPenModeActivated] = useState(false);
 
+	const [midiData, setMidiData] = useState(
+		keys.map((item) => {
+			return {};
+		})
+	);
+
+	//Todo: need to clarify timing of measures and beats. 0 should be 1st bar, 1 should be 2nd bar.
+
+	function playMidi(startTime) {
+		for (let i = 0; i < midiData.length; i++) {
+			console.log(midiData[i]);
+			Object.keys(midiData[i]).forEach((item) => {
+				const scheduleTimeMS = item * 1000 * timeDivision;
+				// setTimeout(() => {
+				// 	playBeat();
+				// }, scheduleTimeMS);
+			});
+		}
+	}
+
+	const [bpm, setBpm] = useState(120);
+
+	//we can check if is playing to schedule new beats
+	function playBeat() {
+		sound.currentTime = 0; // Reset sound to start
+		sound.play(); // Play sound
+	}
+
+	function startMetronome(bpm) {
+		const interval = 60000 / bpm / 2; // Calculate time interval in milliseconds
+
+		function scheduleBeat() {
+			playBeat(); // Call function to play the beat
+			setTimeout(scheduleBeat, interval); // Schedule next beat after interval
+		}
+
+		// Start the metronome by scheduling the first beat
+		scheduleBeat();
+	}
+
 	useEffect(() => {
+		// Replace with the path to your sound file
+
 		const handleKeyPress = (event) => {
 			if (event.key === "2") {
 				console.log("2 key pressed");
@@ -30,6 +74,10 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 				}
 
 				setPenModeActivated(!penModeActivated);
+			} else if (event.key === " ") {
+				console.log("space");
+				playMidi(0);
+				// startMetronome(160);
 			}
 		};
 
@@ -107,7 +155,14 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 					onBeatClick={(beatIndex) => handleBeatClick(i, beatIndex)}
 					key={i}
 					keyNumber={i}
-					midiNotes={{}}
+					midiNotes={midiData[i]}
+					setMidiNotes={(newNotes) => {
+						setMidiData((prevMidiData) => {
+							const newMidiData = [...prevMidiData]; // Create a shallow copy
+							newMidiData[i] = newNotes; // Update the copy with new notes
+							return newMidiData; // Return the updated state
+						});
+					}}
 					rowHeight={keyHeight}
 					width={pianoWidth}
 					penModeActivated={penModeActivated}

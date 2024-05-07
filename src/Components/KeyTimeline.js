@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import React from "react";
-import "../CSS/KeyRow.css";
-import { isBlackKey } from "../Services/utils";
+import "../CSS/KeyTimeline.css";
+import { getDisplayTime, isBlackKey } from "../Services/utils";
 import MidiBeat from "./MidiBeat";
 
 function KeyTimeline({
@@ -12,8 +12,15 @@ function KeyTimeline({
 	rowHeight,
 	penModeActivated = false,
 }) {
-	const [blackKey, setBlackKey] = useState(false);
+	//dictionary from start time to end time of midi
 	const [midiNotes, setMidiNotes] = useState({});
+
+	const [blackKey, setBlackKey] = useState(false);
+
+	// TODO:
+	// - line divisions up top
+	// - playback
+	// - click and drag.
 
 	useEffect(() => {
 		setBlackKey(isBlackKey(keyNumber));
@@ -42,7 +49,6 @@ function KeyTimeline({
 		const newMidiNotes = { ...midiNotes };
 
 		let startTimes = Object.keys(newMidiNotes).map((key) => parseFloat(key));
-		// startTimes.sort();
 
 		//find and remove any times in startTimes that are within range startOfBeat to endOfBeat
 		startTimes.forEach(function (startTime) {
@@ -57,7 +63,17 @@ function KeyTimeline({
 		setMidiNotes(newMidiNotes);
 	};
 
-	// need to account for doubling beat divisions. keep track of beat state not by index but by map and default
+	const isBeatInLightColorSection = (index) => {
+		return (index % (numBeats / 2)) / numBeats >= 0.25;
+	};
+
+	function getBeatClass(index, blackKey) {
+		if (isBeatInLightColorSection(index)) {
+			return blackKey ? "Lighter-black" : "Lighter-white";
+		} else {
+			return blackKey ? "Black" : "";
+		}
+	}
 
 	return (
 		<div
@@ -65,6 +81,7 @@ function KeyTimeline({
 				display: "flex",
 				height: `${rowHeight}px`,
 				flexDirection: "row",
+				borderLeft: "1px solid white",
 			}}
 		>
 			{Array.from({ length: numBeats }).map((_, index) => (
@@ -72,7 +89,7 @@ function KeyTimeline({
 					key={index}
 					onDoubleClick={() => addBeatAndClearSpaceAsNecessary(index)}
 					onClick={() => handleClick(index)}
-					className={`Beat ${blackKey ? "Black" : ""}`}
+					className={`Beat ${getBeatClass(index, blackKey)}`}
 				></div>
 			))}
 
@@ -85,30 +102,7 @@ function KeyTimeline({
 					removeBeat={removeBeat}
 					penModeActivated={penModeActivated}
 				/>
-				// <div
-				// 	key={startTime}
-				// 	onDoubleClick={() => removeBeat(startTime)}
-				// 	// onClick={() => handleClick(index)}
-				// 	style={{
-				// 		position: "absolute",
-				// 		left: startTime * width + "px",
-				// 		width: (endTime - startTime) * width + "px",
-				// 		height: `${rowHeight}px`,
-				// 		backgroundColor: "red",
-				// 	}}
-				// ></div>
 			))}
-
-			{/* <div
-				style={{
-					position: "absolute",
-					left: (1 / 16) * width + "px",
-					width: 1.5 * (1 / 16) * width + "px",
-					height: "100%",
-					top: "0",
-					backgroundColor: "red",
-				}}
-			></div> */}
 		</div>
 	);
 }

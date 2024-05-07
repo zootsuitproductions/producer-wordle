@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import "../CSS/KeyRow.css";
+import "../CSS/KeyTimeline.css";
 
 function MidiBeat({
 	removeBeat,

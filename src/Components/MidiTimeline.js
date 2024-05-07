@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import React from "react";
 import "../App.css";
 import KeyTimeline from "./KeyTimeline";
+import TopOfTimeline from "./TopOfTimeline";
 
 function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 	const MAX_LEFT = leftSidePosition;
@@ -9,7 +10,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 
 	const [pianoWidth, setPianoWidth] = useState(minWidth);
 	const [leftPosition, setLeftPosition] = useState(MAX_LEFT);
-	const [timeDivision, setTimeDivision] = useState(16);
+	const [timeDivision, setTimeDivision] = useState(32);
 	const [penModeActivated, setPenModeActivated] = useState(false);
 
 	useEffect(() => {
@@ -116,7 +117,12 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		return rows;
 	};
 
-	return <div style={containerStyle}>{renderKeyRows()}</div>;
+	return (
+		<div style={containerStyle}>
+			<TopOfTimeline timeDivision={timeDivision} />
+			{renderKeyRows()}
+		</div>
+	);
 }
 
 export default MidiTimeline;

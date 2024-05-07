@@ -1,0 +1,26 @@
+.Beat {
+    border-right: 1px solid #424242;
+    flex: 1;
+  }
+
+.Lighter-white {
+  background-color: #535353;
+}
+
+.Black {
+  background-color: #474747;
+}
+
+.Lighter-black {
+  background-color: #4B4B4B;
+}
+
+.Key-container {
+  display: flex;
+  height: 30px;
+  flex-direction: row;
+}
+
+.Active {
+  background: red;
+}

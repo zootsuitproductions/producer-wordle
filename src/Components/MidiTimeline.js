@@ -4,13 +4,13 @@ import "../App.css";
 import KeyTimeline from "./KeyTimeline";
 
 function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
-	// const MIN_WIDTH = 400;
 	const MAX_LEFT = leftSidePosition;
 	const MIN_RIGHT = MAX_LEFT + minWidth;
 
 	const [pianoWidth, setPianoWidth] = useState(minWidth);
 	const [leftPosition, setLeftPosition] = useState(MAX_LEFT);
 	const [timeDivision, setTimeDivision] = useState(16);
+	const [penModeActivated, setPenModeActivated] = useState(false);
 
 	useEffect(() => {
 		const handleKeyPress = (event) => {
@@ -20,6 +20,15 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 			} else if (event.key === "1") {
 				console.log("1 key pressed");
 				setTimeDivision(timeDivision / 2);
+			} else if (event.key === "b") {
+				const body = document.querySelector("body");
+				if (!penModeActivated) {
+					body.style.cursor = "crosshair";
+				} else {
+					body.style.cursor = "auto";
+				}
+
+				setPenModeActivated(!penModeActivated);
 			}
 		};
 
@@ -28,9 +37,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		return () => {
 			document.removeEventListener("keydown", handleKeyPress);
 		};
-	}, [timeDivision]);
-
-	// midi state. need map
+	}, [timeDivision, penModeActivated]);
 
 	useEffect(() => {
 		const handleZoom = (e) => {
@@ -73,6 +80,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 	}, [pianoWidth]);
 
 	const containerStyle = {
+		// cursor: `crosshair, auto`,
 		width: `${pianoWidth}px`, // Assuming each key has a width of 100px
 		flexDirection: "column",
 		position: "absolute",
@@ -101,6 +109,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 					midiNotes={{}}
 					rowHeight={keyHeight}
 					width={pianoWidth}
+					penModeActivated={penModeActivated}
 				/>
 			);
 		}

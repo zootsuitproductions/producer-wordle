@@ -1,4 +1,12 @@
+
+
+html {
+  overflow-x: hidden;
+  background-color: black;
+}
+
 .App {
+  background-color: #282c34;
   text-align: center;
 }
 

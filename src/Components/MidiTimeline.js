@@ -43,7 +43,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 	useEffect(() => {
 		const handleZoom = (e) => {
 			if (e.altKey || e.ctrlKey) {
-				var scaleFactor = e.ctrlKey ? -4 : -1; //mouse vs trackpad sensitivity
+				var scaleFactor = e.ctrlKey ? -12 : -5; //mouse vs trackpad sensitivity
 				e.preventDefault();
 
 				//0: calculate the mouse position - to box left

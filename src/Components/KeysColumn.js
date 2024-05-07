@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { isBlackKey } from "../Services/utils";
 import "../CSS/KeysColumn.css";
 import TopOfTimeline from "./TopOfTimeline";
+import TopLeftKeyboardPanel from "./TopLeftKeyboardPanel";
 
 function KeysColumn({ keys, keyWidth, keyPlusSampleWidth = 200, keyHeight }) {
 	var keysDisplay = [];
@@ -23,7 +24,6 @@ function KeysColumn({ keys, keyWidth, keyPlusSampleWidth = 200, keyHeight }) {
 					color: "white",
 					width: keyPlusSampleWidth + "px",
 					textAlign: "left",
-					// alignItems: "center",
 					backgroundColor: "#3F3F3F",
 				}}
 			>
@@ -44,7 +44,7 @@ function KeysColumn({ keys, keyWidth, keyPlusSampleWidth = 200, keyHeight }) {
 	}
 	return (
 		<div className="Keys-container">
-			<TopOfTimeline timeDivision={1} />
+			<TopLeftKeyboardPanel />
 			{keysDisplay}
 		</div>
 	);

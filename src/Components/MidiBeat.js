@@ -30,9 +30,11 @@ function MidiBeat({
 			style={{
 				position: "absolute",
 				left: startTime * width + "px",
-				width: (endTime - startTime) * width + "px",
-				height: `${rowHeight}px`,
-				backgroundColor: "red",
+				width: (endTime - startTime) * width - 2 + "px",
+				height: `${rowHeight - 2}px`,
+				backgroundColor: "lightBlue",
+				borderRadius: "1px",
+				outline: "2px solid black",
 			}}
 		></div>
 	);

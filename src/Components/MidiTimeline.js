@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import React from "react";
 import "../App.css";
 import KeyTimeline from "./KeyTimeline";
@@ -14,29 +14,65 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 	const [leftPosition, setLeftPosition] = useState(MAX_LEFT);
 	const [timeDivision, setTimeDivision] = useState(32);
 	const [penModeActivated, setPenModeActivated] = useState(false);
-
 	const [midiData, setMidiData] = useState(
 		keys.map((item) => {
 			return {};
 		})
 	);
+	const [bpm, setBpm] = useState(120);
+	const oneBeatMS = 60000 / bpm;
+	const numBars = 4;
+	const beatsPerBar = 4;
+	const oneBarMS = oneBeatMS * beatsPerBar;
+
+	const [playheadPosition, setPlayheadPosition] = useState(0);
 
 	//Todo: need to clarify timing of measures and beats. 0 should be 1st bar, 1 should be 2nd bar.
 
+	//code to get parent height
+	const containerRef = useRef(null);
+	useEffect(() => {
+		if (containerRef.current) {
+			const parentHeight = containerRef.current.clientHeight;
+			// Use parentHeight as needed
+			console.log("Parent container height:", parentHeight);
+		}
+	}, [containerRef]);
+
+	function movePlayheadOverTime() {
+		const totalMSToTravel4Bars = oneBarMS * 4;
+		let elapsedTimeSinceStart = 0;
+		const MSperFrame = 16;
+
+		const interval = setInterval(() => {
+			// Update playhead position based on time or other trigger
+			setPlayheadPosition(
+				(elapsedTimeSinceStart / totalMSToTravel4Bars) * pianoWidth
+			);
+			elapsedTimeSinceStart += MSperFrame;
+
+			if (elapsedTimeSinceStart >= totalMSToTravel4Bars) {
+				clearInterval(interval); // Stop the interval when the specified time is reached
+			}
+		}, MSperFrame); // Aim for ~60 FPS
+	}
+
+	//getting very messy, need audio playback engine
 	function playMidi(startTime) {
 		for (let i = 0; i < midiData.length; i++) {
-			console.log(midiData[i]);
+			// console.log(midiData[i]);
 			Object.keys(midiData[i]).forEach((item) => {
 				// console.log(item);
-				// const scheduleTimeMS = item * 1000 * timeDivision;
-				// setTimeout(() => {
-				// 	playBeat();
-				// }, scheduleTimeMS);
+				const scheduleTimeMS = item * oneBarMS;
+				setTimeout(() => {
+					playBeat();
+					// setPlayheadPosition(pianoWidth * (item / numBars));
+				}, scheduleTimeMS);
+
+				movePlayheadOverTime();
 			});
 		}
 	}
-
-	const [bpm, setBpm] = useState(120);
 
 	//we can check if is playing to schedule new beats
 	function playBeat() {
@@ -87,7 +123,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		return () => {
 			document.removeEventListener("keydown", handleKeyPress);
 		};
-	}, [timeDivision, penModeActivated, midiData]);
+	}, [timeDivision, penModeActivated, midiData, containerRef]);
 
 	useEffect(() => {
 		const handleZoom = (e) => {
@@ -174,9 +210,23 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 	};
 
 	return (
-		<div style={containerStyle}>
+		<div ref={containerRef} style={containerStyle}>
 			<TopOfTimeline timeDivision={timeDivision} />
 			{renderKeyRows()}
+			<div
+				style={{
+					position: "absolute",
+					top: "0px",
+					left: playheadPosition + "px",
+					width: "1px",
+					height: containerRef.current
+						? containerRef.current.clientHeight + "px"
+						: "100%", //i want to read the height of the parent container
+					borderLeft: "1px white solid",
+					// zIndex: "2",
+					color: "white",
+				}}
+			></div>
 		</div>
 	);
 }

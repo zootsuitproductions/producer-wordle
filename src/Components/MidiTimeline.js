@@ -27,7 +27,8 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		for (let i = 0; i < midiData.length; i++) {
 			console.log(midiData[i]);
 			Object.keys(midiData[i]).forEach((item) => {
-				const scheduleTimeMS = item * 1000 * timeDivision;
+				// console.log(item);
+				// const scheduleTimeMS = item * 1000 * timeDivision;
 				// setTimeout(() => {
 				// 	playBeat();
 				// }, scheduleTimeMS);
@@ -86,7 +87,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		return () => {
 			document.removeEventListener("keydown", handleKeyPress);
 		};
-	}, [timeDivision, penModeActivated]);
+	}, [timeDivision, penModeActivated, midiData]);
 
 	useEffect(() => {
 		const handleZoom = (e) => {

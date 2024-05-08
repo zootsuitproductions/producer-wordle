@@ -9,6 +9,7 @@ function MidiBeat({
 	penModeActivated = true,
 	width,
 	rowHeight,
+	numBars = 4,
 }) {
 	const handleDoubleClick = () => {
 		removeBeat(startTime);
@@ -29,14 +30,16 @@ function MidiBeat({
 			onClick={() => handleClick()}
 			style={{
 				position: "absolute",
-				left: startTime * width + "px",
-				width: (endTime - startTime) * width - 2 + "px",
+				left: (startTime / numBars) * width + "px",
+				width: ((endTime - startTime) / numBars) * width - 2 + "px",
 				height: `${rowHeight - 2}px`,
 				backgroundColor: "lightBlue",
 				borderRadius: "1px",
 				outline: "2px solid black",
 			}}
-		></div>
+		>
+			{startTime}
+		</div>
 	);
 }
 

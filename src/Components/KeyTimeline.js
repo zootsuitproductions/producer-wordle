@@ -13,6 +13,7 @@ function KeyTimeline({
 	midiNotes,
 	setMidiNotes,
 	penModeActivated = false,
+	numBars = 4,
 }) {
 	//dictionary from start time to end time of midi
 	// const [midiNotes, setMidiNotes] = useState({});
@@ -43,10 +44,10 @@ function KeyTimeline({
 		}
 	};
 
-	// todo
+	// todo make timing object oriented and clear.
 	const addBeatAndClearSpaceAsNecessary = (index) => {
-		const startOfBeat = index / numBeats;
-		const endOfBeat = (index + 1) / numBeats;
+		const startOfBeat = numBars * (index / numBeats);
+		const endOfBeat = numBars * ((index + 1) / numBeats);
 
 		const newMidiNotes = { ...midiNotes };
 
@@ -103,6 +104,7 @@ function KeyTimeline({
 					rowHeight={rowHeight}
 					removeBeat={removeBeat}
 					penModeActivated={penModeActivated}
+					numBars={numBars}
 				/>
 			))}
 		</div>

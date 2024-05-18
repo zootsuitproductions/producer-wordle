@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 
-export default function useMidi(data) {
-	const [midiData, setMidiData] = useState(data); //list is sorted by startBeat time
-
+export default function useMidi(midiData) {
 	function getNextBeatAfter(currentBeat) {
 		let left = 0;
 		let right = midiData.length - 1;

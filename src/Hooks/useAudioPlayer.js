@@ -6,9 +6,7 @@ const audioSamples = [
 	new Audio("[SAINT6] Bounce Clap.wav"),
 ];
 
-const bpm = 100;
-
-export default function useAudioMidiPlayer(data) {
+export default function useAudioMidiPlayer(data, bpm) {
 	const { midiData, getNextBeatAfter } = useMidi(data);
 
 	const [isPlaying, setIsPlaying] = useState(false);
@@ -89,6 +87,7 @@ export default function useAudioMidiPlayer(data) {
 	}
 
 	useEffect(() => {
+		console.log("MIDI DATA " + midiData + " !");
 		if (isPlaying) {
 			if (!playedFirstBeat) {
 				playFirstNoteTimeZero();

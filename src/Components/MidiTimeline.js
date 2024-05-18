@@ -15,20 +15,44 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 	const [leftPosition, setLeftPosition] = useState(MAX_LEFT);
 	const [timeDivision, setTimeDivision] = useState(32);
 	const [penModeActivated, setPenModeActivated] = useState(false);
-	const [midiData, setMidiData] = useState(
+	const [midiDataByNote, setMidiData] = useState(
 		keys.map((item) => {
 			return {};
 		})
 	);
+	const [midiDataSorted, setMidiDataSorted] = useState([]);
 
 	const [bpm, setBpm] = useState(120);
-	const oneBeatMS = 60000 / bpm;
-	const numBars = 4;
-	const beatsPerBar = 4;
-	const oneBarMS = oneBeatMS * beatsPerBar;
 
 	const [playheadPosition, setPlayheadPosition] = useState(0);
-	const [currentlyPlaying, setCurrentlyPlaying] = useState(false);
+
+	const TOTAL_BEATS = 16;
+	const { getCurrentBeat, togglePlay } = useAudioMidiPlayer(
+		midiDataSorted,
+		bpm
+	);
+
+	// Function to convert midiDataByNote to midiDataSorted
+	const sortMidiDataByTime = () => {
+		let sortedData = [];
+		midiDataByNote.forEach((notes, noteIndex) => {
+			for (let startBeat in notes) {
+				sortedData.push({
+					note: noteIndex,
+					startBeat: parseFloat(startBeat) * 4,
+					endBeat: notes[startBeat],
+					velocity: 0.9, // Default velocity, adjust as necessary
+				});
+			}
+		});
+		sortedData.sort((a, b) => a.startBeat - b.startBeat);
+		console.log(sortedData);
+		setMidiDataSorted(sortedData);
+	};
+
+	useEffect(() => {
+		sortMidiDataByTime();
+	}, [midiDataByNote]);
 
 	//Todo: need to clarify timing of measures and beats. 0 should be 1st bar, 1 should be 2nd bar.
 
@@ -61,8 +85,6 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 				setPenModeActivated(!penModeActivated);
 			} else if (event.key === " ") {
 				togglePlay();
-				// todo. figure out if its context or what i need to use. the playhead component needs to
-				// update in real time. whats up with scheduling
 			}
 		};
 
@@ -71,7 +93,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		return () => {
 			document.removeEventListener("keydown", handleKeyPress);
 		};
-	}, [timeDivision, penModeActivated, midiData, containerRef]);
+	}, [timeDivision, penModeActivated, midiDataByNote, containerRef]);
 
 	useEffect(() => {
 		const handleZoom = (e) => {
@@ -126,9 +148,8 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		console.log("clicked " + keyIndex + beatIndex);
 	};
 
-	const rows = [];
-
 	const renderKeyRows = () => {
+		const rows = [];
 		for (let i = keys.length - 1; i >= 0; i--) {
 			rows.push(
 				<KeyTimeline
@@ -136,8 +157,9 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 					onBeatClick={(beatIndex) => handleBeatClick(i, beatIndex)}
 					key={i}
 					keyNumber={i}
-					midiNotes={midiData[i]}
+					midiNotes={midiDataByNote[i]}
 					setMidiNotes={(newNotes) => {
+						console.log(midiDataByNote);
 						setMidiData((prevMidiData) => {
 							const newMidiData = [...prevMidiData]; // Create a shallow copy
 							newMidiData[i] = newNotes; // Update the copy with new notes
@@ -155,17 +177,6 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 
 	//todo: add logic to add beats in this format. change the timing to be in terms of beats.
 	// ALSO need concurrent logic
-	const TOTAL_BEATS = 16;
-	const { getCurrentBeat, togglePlay } = useAudioMidiPlayer([
-		{ note: 0, startBeat: 0, endBeat: 0.5, velocity: 0.9 },
-		{ note: 0, startBeat: 1, endBeat: 1, velocity: 0.8 },
-		{ note: 0, startBeat: 2, endBeat: 2, velocity: 0.85 },
-		{ note: 0, startBeat: 3, endBeat: 2, velocity: 0.85 },
-
-		{ note: 0, startBeat: 4, endBeat: 2, velocity: 0.85 },
-
-		{ note: 0, startBeat: 5, endBeat: 2, velocity: 0.85 },
-	]);
 
 	useEffect(() => {
 		const updatePlayheadPosition = () => {

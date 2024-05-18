@@ -3,8 +3,9 @@ import React from "react";
 import "../App.css";
 import KeyTimeline from "./KeyTimeline";
 import TopOfTimeline from "./TopOfTimeline";
-
-const sound = new Audio("cc kick.wav");
+import { playMidi, getPlaybackPosition } from "../Services/AudioPlayback";
+import Playhead from "./Playhead";
+import useAudioMidiPlayer from "../Hooks/useAudioPlayer";
 
 function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 	const MAX_LEFT = leftSidePosition;
@@ -19,6 +20,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 			return {};
 		})
 	);
+
 	const [bpm, setBpm] = useState(120);
 	const oneBeatMS = 60000 / bpm;
 	const numBars = 4;
@@ -26,6 +28,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 	const oneBarMS = oneBeatMS * beatsPerBar;
 
 	const [playheadPosition, setPlayheadPosition] = useState(0);
+	const [currentlyPlaying, setCurrentlyPlaying] = useState(false);
 
 	//Todo: need to clarify timing of measures and beats. 0 should be 1st bar, 1 should be 2nd bar.
 
@@ -39,62 +42,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		}
 	}, [containerRef]);
 
-	function movePlayheadOverTime() {
-		const totalMSToTravel4Bars = oneBarMS * 4;
-		let elapsedTimeSinceStart = 0;
-		const MSperFrame = 16;
-
-		const interval = setInterval(() => {
-			// Update playhead position based on time or other trigger
-			setPlayheadPosition(
-				(elapsedTimeSinceStart / totalMSToTravel4Bars) * pianoWidth
-			);
-			elapsedTimeSinceStart += MSperFrame;
-
-			if (elapsedTimeSinceStart >= totalMSToTravel4Bars) {
-				clearInterval(interval); // Stop the interval when the specified time is reached
-			}
-		}, MSperFrame); // Aim for ~60 FPS
-	}
-
-	//getting very messy, need audio playback engine
-	function playMidi(startTime) {
-		for (let i = 0; i < midiData.length; i++) {
-			// console.log(midiData[i]);
-			Object.keys(midiData[i]).forEach((item) => {
-				// console.log(item);
-				const scheduleTimeMS = item * oneBarMS;
-				setTimeout(() => {
-					playBeat();
-					// setPlayheadPosition(pianoWidth * (item / numBars));
-				}, scheduleTimeMS);
-
-				movePlayheadOverTime();
-			});
-		}
-	}
-
-	//we can check if is playing to schedule new beats
-	function playBeat() {
-		sound.currentTime = 0; // Reset sound to start
-		sound.play(); // Play sound
-	}
-
-	function startMetronome(bpm) {
-		const interval = 60000 / bpm / 2; // Calculate time interval in milliseconds
-
-		function scheduleBeat() {
-			playBeat(); // Call function to play the beat
-			setTimeout(scheduleBeat, interval); // Schedule next beat after interval
-		}
-
-		// Start the metronome by scheduling the first beat
-		scheduleBeat();
-	}
-
 	useEffect(() => {
-		// Replace with the path to your sound file
-
 		const handleKeyPress = (event) => {
 			if (event.key === "2") {
 				console.log("2 key pressed");
@@ -112,9 +60,9 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 
 				setPenModeActivated(!penModeActivated);
 			} else if (event.key === " ") {
-				console.log("space");
-				playMidi(0);
-				// startMetronome(160);
+				togglePlay();
+				// todo. figure out if its context or what i need to use. the playhead component needs to
+				// update in real time. whats up with scheduling
 			}
 		};
 
@@ -178,10 +126,6 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		console.log("clicked " + keyIndex + beatIndex);
 	};
 
-	const getBeatIndexOfMouse = (xPosition) => {
-		return Math.floor(((xPosition - leftPosition) / pianoWidth) * timeDivision);
-	};
-
 	const rows = [];
 
 	const renderKeyRows = () => {
@@ -209,8 +153,40 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		return rows;
 	};
 
+	//todo: add logic to add beats in this format. change the timing to be in terms of beats.
+	// ALSO need concurrent logic
+	const TOTAL_BEATS = 16;
+	const { getCurrentBeat, togglePlay } = useAudioMidiPlayer([
+		{ note: 0, startBeat: 0, endBeat: 0.5, velocity: 0.9 },
+		{ note: 0, startBeat: 1, endBeat: 1, velocity: 0.8 },
+		{ note: 0, startBeat: 2, endBeat: 2, velocity: 0.85 },
+		{ note: 0, startBeat: 3, endBeat: 2, velocity: 0.85 },
+
+		{ note: 0, startBeat: 4, endBeat: 2, velocity: 0.85 },
+
+		{ note: 0, startBeat: 5, endBeat: 2, velocity: 0.85 },
+	]);
+
+	useEffect(() => {
+		const updatePlayheadPosition = () => {
+			const currentBeat = getCurrentBeat();
+			const fraction = currentBeat / TOTAL_BEATS;
+			setPlayheadPosition(fraction);
+		};
+
+		const intervalId = setInterval(updatePlayheadPosition, 30); // Update every 100 milliseconds
+
+		return () => {
+			clearInterval(intervalId); // Cleanup interval on component unmount
+		};
+	}, [getCurrentBeat]);
+
 	return (
 		<div ref={containerRef} style={containerStyle}>
+			<Playhead
+				timelineWidth={pianoWidth}
+				positionFraction={playheadPosition}
+			/>
 			<TopOfTimeline timeDivision={timeDivision} />
 			{renderKeyRows()}
 			<div

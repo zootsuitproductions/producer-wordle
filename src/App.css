@@ -44,3 +44,17 @@ html {
     transform: rotate(360deg);
   }
 }
+
+.timeline--container {
+  height: 50vh;
+  background-color: #111111;
+  position: relative;
+}
+
+.playhead {
+  background: white;
+  width: 1px;
+  height: 100%;
+  position: absolute;
+  /* left: 300px; */
+}

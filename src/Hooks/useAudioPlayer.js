@@ -7,7 +7,7 @@ const audioSamples = [
 ];
 
 export default function useAudioMidiPlayer(data, bpm) {
-	const { midiData, getNextBeatAfter } = useMidi(data);
+	const { midiData, getNextBeatsAfter } = useMidi(data);
 
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [playedFirstBeat, setPlayedFirstBeat] = useState(false);
@@ -48,24 +48,23 @@ export default function useAudioMidiPlayer(data, bpm) {
 	}
 
 	function playFirstNoteTimeZero() {
-		const downBeat = getNextBeatAfter(-1);
-		if (downBeat && downBeat.startBeat === 0) {
-			playMidiNote(downBeat.note);
+		const downBeats = getNextBeatsAfter(-1);
+		if (downBeats && downBeats.length > 0 && downBeats[0].startBeat === 0) {
+			downBeats.map((downBeat) => playMidiNote(downBeat.note));
 		}
 		setPlayedFirstBeat(true);
 	}
 
 	function scheduleNextBeat() {
 		//ADD HANDLING OF CONCURRENT NOTES
-		const nextMidiEvent = getNextBeatAfter(getCurrentBeat());
+		const nextMidiEvents = getNextBeatsAfter(getCurrentBeat());
 
-		if (!nextMidiEvent) {
+		if (!nextMidiEvents) {
 			//schedule the end, stop playing
 			return;
 		}
 
-		const startBeat = nextMidiEvent.startBeat;
-		const midiNote = nextMidiEvent.note;
+		const startBeat = nextMidiEvents[0].startBeat;
 		const beatInterval = 60 / bpm;
 
 		const nextBeatTime = startBeat * beatInterval * 1000; // in milliseconds
@@ -73,7 +72,7 @@ export default function useAudioMidiPlayer(data, bpm) {
 		const delay = nextBeatTime - (currentTime - startTime);
 
 		const timeoutId = setTimeout(() => {
-			playMidiNote(midiNote);
+			nextMidiEvents.map((midiEvent) => playMidiNote(midiEvent.note));
 			if (isPlaying) {
 				scheduleNextBeat();
 			}

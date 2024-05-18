@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 export default function useMidi(midiData) {
-	function getNextBeatAfter(currentBeat) {
+	function getNextBeatsAfter(currentBeat) {
 		let left = 0;
 		let right = midiData.length - 1;
 		let result = -1;
@@ -16,11 +16,28 @@ export default function useMidi(midiData) {
 				left = mid + 1; // Search in the right half
 			}
 		}
-		return result !== -1 ? midiData[result] : null;
+
+		if (result === -1) {
+			return null;
+		}
+
+		const nextBeatStart = midiData[result].startBeat;
+		const nextBeats = [midiData[result]];
+
+		// Collect all events that occur at the same startBeat
+		for (let i = result + 1; i < midiData.length; i++) {
+			if (midiData[i].startBeat === nextBeatStart) {
+				nextBeats.push(midiData[i]);
+			} else {
+				break;
+			}
+		}
+
+		return nextBeats;
 	}
 
 	return {
 		midiData,
-		getNextBeatAfter,
+		getNextBeatsAfter,
 	};
 }

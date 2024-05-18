@@ -175,8 +175,11 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		return rows;
 	};
 
-	//todo: add logic to add beats in this format. change the timing to be in terms of beats.
-	// ALSO need concurrent logic
+	//todo: need concurrent logic
+	// You can play back midi that you draw in! There is a bug with scheduling,
+	// where if u delete a note while playing it will still play.need to unschedule that,
+	// and perhaps dont schedule notes for so far in advance.only do it once we are within
+	// the playhead update interval of the next beat, then schedule for a few ms in advance for precision
 
 	useEffect(() => {
 		const updatePlayheadPosition = () => {

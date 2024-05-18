@@ -37,9 +37,7 @@ function MidiBeat({
 				borderRadius: "1px",
 				outline: "2px solid black",
 			}}
-		>
-			{startTime}
-		</div>
+		></div>
 	);
 }
 

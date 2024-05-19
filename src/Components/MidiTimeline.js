@@ -1,9 +1,8 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
 import "../App.css";
 import KeyTimeline from "./KeyTimeline";
 import TopOfTimeline from "./TopOfTimeline";
-import { playMidi, getPlaybackPosition } from "../Services/AudioPlayback";
 import Playhead from "./Playhead";
 import useAudioMidiPlayer from "../Hooks/useAudioPlayer";
 
@@ -15,6 +14,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 	const [leftPosition, setLeftPosition] = useState(MAX_LEFT);
 	const [timeDivision, setTimeDivision] = useState(32);
 	const [penModeActivated, setPenModeActivated] = useState(false);
+
 	const [midiDataByNote, setMidiData] = useState(
 		keys.map((item) => {
 			return {};
@@ -22,49 +22,41 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 	);
 	const [midiDataSorted, setMidiDataSorted] = useState([]);
 
-	const [bpm, setBpm] = useState(120);
+	const [bpm, setBpm] = useState(140);
+	const TOTAL_BEATS = 16;
 
 	const [playheadPosition, setPlayheadPosition] = useState(0);
-
-	const TOTAL_BEATS = 16;
-	const { getCurrentBeat, togglePlay } = useAudioMidiPlayer(
+	const { togglePlay } = useAudioMidiPlayer(
 		midiDataSorted,
-		bpm
+		bpm,
+		TOTAL_BEATS,
+		setPlayheadPosition
 	);
 
-	// Function to convert midiDataByNote to midiDataSorted
-	const sortMidiDataByTime = () => {
-		let sortedData = [];
-		midiDataByNote.forEach((notes, noteIndex) => {
-			for (let startBeat in notes) {
-				sortedData.push({
-					note: noteIndex,
-					startBeat: parseFloat(startBeat) * 4,
-					endBeat: notes[startBeat],
-					velocity: 0.9, // Default velocity, adjust as necessary
-				});
-			}
-		});
-		sortedData.sort((a, b) => a.startBeat - b.startBeat);
-		console.log(sortedData);
-		setMidiDataSorted(sortedData);
-	};
-
 	useEffect(() => {
+		// Function to convert midiDataByNote to midiDataSorted
+		const sortMidiDataByTime = () => {
+			let sortedData = [];
+			midiDataByNote.forEach((notes, noteIndex) => {
+				for (let startBeat in notes) {
+					sortedData.push({
+						note: noteIndex,
+						startBeat: parseFloat(startBeat) * 4,
+						endBeat: notes[startBeat],
+						velocity: 0.9, // Default velocity, adjust as necessary
+					});
+				}
+			});
+			sortedData.sort((a, b) => a.startBeat - b.startBeat);
+			console.log(sortedData);
+
+			setMidiDataSorted(sortedData);
+		};
+
 		sortMidiDataByTime();
 	}, [midiDataByNote]);
 
 	//Todo: need to clarify timing of measures and beats. 0 should be 1st bar, 1 should be 2nd bar.
-
-	//code to get parent height
-	const containerRef = useRef(null);
-	useEffect(() => {
-		if (containerRef.current) {
-			const parentHeight = containerRef.current.clientHeight;
-			// Use parentHeight as needed
-			console.log("Parent container height:", parentHeight);
-		}
-	}, [containerRef]);
 
 	useEffect(() => {
 		const handleKeyPress = (event) => {
@@ -93,7 +85,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		return () => {
 			document.removeEventListener("keydown", handleKeyPress);
 		};
-	}, [timeDivision, penModeActivated, midiDataByNote, containerRef]);
+	}, [timeDivision, penModeActivated, midiDataByNote, togglePlay]);
 
 	useEffect(() => {
 		const handleZoom = (e) => {
@@ -133,10 +125,9 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		return () => {
 			document.removeEventListener("wheel", handleZoom);
 		};
-	}, [pianoWidth]);
+	}, [pianoWidth, MAX_LEFT, MIN_RIGHT, leftPosition, minWidth]);
 
 	const containerStyle = {
-		// cursor: `crosshair, auto`,
 		width: `${pianoWidth}px`, // Assuming each key has a width of 100px
 		flexDirection: "column",
 		position: "absolute",
@@ -175,48 +166,14 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		return rows;
 	};
 
-	//todo: need concurrent logic
-	// You can play back midi that you draw in! There is a bug with scheduling,
-	// where if u delete a note while playing it will still play.need to unschedule that,
-	// and perhaps dont schedule notes for so far in advance.only do it once we are within
-	// the playhead update interval of the next beat, then schedule for a few ms in advance for precision
-
-	useEffect(() => {
-		const updatePlayheadPosition = () => {
-			const currentBeat = getCurrentBeat();
-			const fraction = currentBeat / TOTAL_BEATS;
-			setPlayheadPosition(fraction);
-		};
-
-		const intervalId = setInterval(updatePlayheadPosition, 30); // Update every 100 milliseconds
-
-		return () => {
-			clearInterval(intervalId); // Cleanup interval on component unmount
-		};
-	}, [getCurrentBeat]);
-
 	return (
-		<div ref={containerRef} style={containerStyle}>
+		<div style={containerStyle}>
 			<Playhead
 				timelineWidth={pianoWidth}
 				positionFraction={playheadPosition}
 			/>
 			<TopOfTimeline timeDivision={timeDivision} />
 			{renderKeyRows()}
-			<div
-				style={{
-					position: "absolute",
-					top: "0px",
-					left: playheadPosition + "px",
-					width: "1px",
-					height: containerRef.current
-						? containerRef.current.clientHeight + "px"
-						: "100%", //i want to read the height of the parent container
-					borderLeft: "1px white solid",
-					// zIndex: "2",
-					color: "white",
-				}}
-			></div>
 		</div>
 	);
 }

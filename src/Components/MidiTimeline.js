@@ -17,7 +17,6 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 
 	const {
 		midiDataByNote,
-		setMidiData,
 		addNoteAndClearSpaceAsNecessary,
 		midiDataSorted,
 		checkForCorrectness,

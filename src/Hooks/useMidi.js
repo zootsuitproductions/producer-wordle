@@ -105,7 +105,6 @@ const useMidi = (keys) => {
 
 	return {
 		midiDataByNote: keytracksData,
-		setMidiData,
 		addNoteAndClearSpaceAsNecessary,
 		removeNote,
 		checkForCorrectness,

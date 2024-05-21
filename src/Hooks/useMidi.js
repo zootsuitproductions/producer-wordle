@@ -12,8 +12,8 @@ const useMidi = (keys) => {
 		const sortMidiDataByTime = () => {
 			let sortedData = [];
 
-			keytracksData.forEach((keyNotes) => {
-				keyNotes.forEach((note) => {
+			keytracksData.forEach((keytrack) => {
+				keytrack.forEach((note) => {
 					sortedData.push(note);
 				});
 			});
@@ -70,8 +70,27 @@ const useMidi = (keys) => {
 	}
 
 	function checkForCorrectness(correctKeytracksData) {
-		correctKeytracksData.forEach((keytrack, noteIndex) => {
-			keytracksData[noteIndex].correctAgainst(keytrack);
+		setMidiData((prevKeyTracks) => {
+			return prevKeyTracks.map((userKeytrack, noteIndex) => {
+				const correctKeytrack = correctKeytracksData[noteIndex];
+				console.log(correctKeytrack);
+
+				const correctedKeytrack = userKeytrack.map((noteEvent) => {
+					let isCorrect = false;
+					for (let correctNoteEvent of correctKeytrack) {
+						if (noteEvent.startBeat === correctNoteEvent.startBeat) {
+							isCorrect = true;
+							break;
+						}
+					}
+					return new MidiNoteEvent({
+						...noteEvent,
+						correct: isCorrect,
+					});
+				});
+
+				return correctedKeytrack;
+			});
 		});
 	}
 
@@ -80,6 +99,7 @@ const useMidi = (keys) => {
 		setMidiData,
 		addNoteAndClearSpaceAsNecessary,
 		removeNote,
+		checkForCorrectness,
 		midiDataSorted,
 	};
 };

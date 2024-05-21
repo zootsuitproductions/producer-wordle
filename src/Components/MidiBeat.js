@@ -9,6 +9,7 @@ function MidiBeat({
 	penModeActivated = true,
 	width,
 	rowHeight,
+	correct,
 	numBeats = 16,
 }) {
 	const handleDoubleClick = () => {
@@ -33,7 +34,7 @@ function MidiBeat({
 				left: (startTime / numBeats) * width + "px",
 				width: ((endTime - startTime) / numBeats) * width - 2 + "px",
 				height: `${rowHeight - 2}px`,
-				backgroundColor: "lightBlue",
+				backgroundColor: correct ? "lightBlue" : "red",
 				borderRadius: "1px",
 				outline: "2px solid black",
 			}}

@@ -70,6 +70,7 @@ function KeyTimeline({
 				<MidiBeat
 					startTime={midiNote.startBeat}
 					endTime={midiNote.endBeat}
+					correct={midiNote.correct}
 					width={width}
 					rowHeight={rowHeight}
 					removeBeat={() => removeNote(keyNumber, midiNote.startBeat)}

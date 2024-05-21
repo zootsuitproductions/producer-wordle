@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import MidiNoteEvent from "../Models/MidiNoteEvent";
 
-export default function useMidiEditorControls(togglePlay) {
+export default function useMidiEditorControls(togglePlay, checkForCorrectness) {
 	const [timeDivision, setTimeDivision] = useState(32);
 	const [penModeActivated, setPenModeActivated] = useState(false);
 	const [tripledModeActivated, setTripletModeActivated] = useState(false);
@@ -8,6 +9,25 @@ export default function useMidiEditorControls(togglePlay) {
 	useEffect(() => {
 		const handleKeyPress = (event) => {
 			switch (event.key) {
+				case "c":
+					checkForCorrectness([
+						[
+							new MidiNoteEvent({ note: 0, startBeat: 0, endBeat: 1 }),
+							new MidiNoteEvent({ note: 0, startBeat: 1, endBeat: 1 }),
+						],
+						[],
+						[],
+						[],
+						[],
+						[],
+						[],
+						[],
+						[],
+						[],
+						[],
+						[],
+					]);
+					break;
 				case "3":
 					if (tripledModeActivated) {
 						setTimeDivision((timeDivision / 3) * 2);

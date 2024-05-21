@@ -20,6 +20,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		setMidiData,
 		addNoteAndClearSpaceAsNecessary,
 		midiDataSorted,
+		checkForCorrectness,
 		removeNote,
 	} = useMidi(keys);
 
@@ -33,7 +34,10 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		setPlayheadPosition
 	);
 
-	const { timeDivision, penModeActivated } = useMidiEditorControls(togglePlay);
+	const { timeDivision, penModeActivated } = useMidiEditorControls(
+		togglePlay,
+		checkForCorrectness
+	);
 
 	//Todo: need to clarify timing of measures and beats. 0 should be 1st bar, 1 should be 2nd bar.
 

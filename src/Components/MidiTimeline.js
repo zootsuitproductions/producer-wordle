@@ -21,6 +21,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		addNoteAndClearSpaceAsNecessary,
 		midiDataSorted,
 		checkForCorrectness,
+		saveToLocalStorage,
 		removeNote,
 	} = useMidi(keys);
 
@@ -36,10 +37,9 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 
 	const { timeDivision, penModeActivated } = useMidiEditorControls(
 		togglePlay,
-		checkForCorrectness
+		checkForCorrectness,
+		saveToLocalStorage
 	);
-
-	//Todo: need to clarify timing of measures and beats. 0 should be 1st bar, 1 should be 2nd bar.
 
 	useEffect(() => {
 		const handleZoom = (e) => {
@@ -92,8 +92,10 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 
 	const renderKeyRows = () => {
 		return keys.map((_, index) => {
+			console.log(timeDivision);
 			return (
 				<KeyTimeline
+					timeDivision={timeDivision}
 					numBeats={TOTAL_BEATS}
 					key={index}
 					keyNumber={index}

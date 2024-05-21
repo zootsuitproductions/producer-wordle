@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import MidiNoteEvent from "../Models/MidiNoteEvent";
 
-export default function useMidiEditorControls(togglePlay, checkForCorrectness) {
+export default function useMidiEditorControls(
+	togglePlay,
+	checkForCorrectness,
+	saveToLocalStorage
+) {
 	const [timeDivision, setTimeDivision] = useState(32);
 	const [penModeActivated, setPenModeActivated] = useState(false);
 	const [tripledModeActivated, setTripletModeActivated] = useState(false);
@@ -9,24 +13,11 @@ export default function useMidiEditorControls(togglePlay, checkForCorrectness) {
 	useEffect(() => {
 		const handleKeyPress = (event) => {
 			switch (event.key) {
+				case "s":
+					saveToLocalStorage();
+					break;
 				case "c":
-					checkForCorrectness([
-						[
-							new MidiNoteEvent({ note: 0, startBeat: 0, endBeat: 1 }),
-							new MidiNoteEvent({ note: 0, startBeat: 1, endBeat: 1 }),
-						],
-						[],
-						[],
-						[],
-						[],
-						[],
-						[],
-						[],
-						[],
-						[],
-						[],
-						[],
-					]);
+					checkForCorrectness();
 					break;
 				case "3":
 					if (tripledModeActivated) {
@@ -65,7 +56,13 @@ export default function useMidiEditorControls(togglePlay, checkForCorrectness) {
 		return () => {
 			document.removeEventListener("keydown", handleKeyPress);
 		};
-	}, [timeDivision, penModeActivated, tripledModeActivated, togglePlay]);
+	}, [
+		timeDivision,
+		penModeActivated,
+		tripledModeActivated,
+		togglePlay,
+		saveToLocalStorage,
+	]);
 
 	return {
 		timeDivision,

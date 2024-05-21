@@ -11,6 +11,7 @@ function KeyTimeline({
 	midiNotes,
 	addNoteAndClearSpaceAsNecessary,
 	penModeActivated = false,
+	timeDivision = 16,
 	numBeats = 16,
 	removeNote,
 }) {
@@ -30,13 +31,15 @@ function KeyTimeline({
 	};
 
 	function penInNote(index) {
-		const startOfBeat = numBeats * (index / numBeats);
-		const endOfBeat = numBeats * ((index + 1) / numBeats);
+		const startOfBeat = (numBeats * index) / timeDivision;
+
+		console.log(startOfBeat);
+		const endOfBeat = numBeats * ((index + 1) / timeDivision);
 		addNoteAndClearSpaceAsNecessary(keyNumber, startOfBeat, endOfBeat);
 	}
 
 	const isBeatInLightColorSection = (index) => {
-		return (index % (numBeats / 2)) / numBeats >= 0.25;
+		return (index % (timeDivision / 2)) / timeDivision >= 0.25;
 	};
 
 	function getBeatClass(index, blackKey) {
@@ -56,7 +59,7 @@ function KeyTimeline({
 				borderLeft: "1px solid white",
 			}}
 		>
-			{Array.from({ length: numBeats }).map((_, index) => (
+			{Array.from({ length: timeDivision }).map((_, index) => (
 				<div
 					key={index}
 					onDoubleClick={() => penInNote(index)}
@@ -75,7 +78,7 @@ function KeyTimeline({
 					rowHeight={rowHeight}
 					removeBeat={() => removeNote(keyNumber, midiNote.startBeat)}
 					penModeActivated={penModeActivated}
-					numBars={numBeats}
+					numBars={timeDivision}
 				/>
 			))}
 		</div>

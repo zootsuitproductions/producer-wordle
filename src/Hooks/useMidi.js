@@ -7,6 +7,9 @@ const useMidi = (keys) => {
 	const [midiDataSorted, setMidiDataSorted] = useState([]);
 	//todo: SSoT. dekete midiDataByNote.
 	// insert into sorted every time, expose a method to get the single key notes list,
+	function saveToLocalStorage() {
+		localStorage.setItem("correctData", JSON.stringify(keytracksData));
+	}
 
 	useEffect(() => {
 		const sortMidiDataByTime = () => {
@@ -69,7 +72,13 @@ const useMidi = (keys) => {
 		}
 	}
 
-	function checkForCorrectness(correctKeytracksData) {
+	const getKeytracksDataFromLocalStorage = () => {
+		const data = localStorage.getItem("correctData");
+		return data ? JSON.parse(data) : [];
+	};
+
+	function checkForCorrectness() {
+		const correctKeytracksData = getKeytracksDataFromLocalStorage();
 		setMidiData((prevKeyTracks) => {
 			return prevKeyTracks.map((userKeytrack, noteIndex) => {
 				const correctKeytrack = correctKeytracksData[noteIndex];
@@ -100,6 +109,7 @@ const useMidi = (keys) => {
 		addNoteAndClearSpaceAsNecessary,
 		removeNote,
 		checkForCorrectness,
+		saveToLocalStorage,
 		midiDataSorted,
 	};
 };

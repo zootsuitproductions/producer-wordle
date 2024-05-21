@@ -12,7 +12,7 @@ function MidiBeat({
 	numBars = 4,
 }) {
 	const handleDoubleClick = () => {
-		removeBeat(startTime);
+		removeBeat();
 	};
 
 	const handleClick = () => {

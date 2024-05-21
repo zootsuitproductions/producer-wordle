@@ -5,11 +5,17 @@ const audioSamples = [
 	new Audio("[SAINT6] Bounce Clap.wav"),
 ];
 
+// going to need to do synchronized playback with buffers and shit
+//use the song playback position as the guide for the midi notes
+
+const songNoDrumsSample = new Audio("end of the road boys no drums.wav");
+
 export default function useAudioMidiPlayer(
 	data,
 	bpm,
 	TOTAL_BEATS,
-	setPlayheadPosition
+	setPlayheadPosition,
+	loop = true
 ) {
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [playedFirstBeat, setPlayedFirstBeat] = useState(false);
@@ -46,6 +52,15 @@ export default function useAudioMidiPlayer(
 			const updatePlayheadPosition = () => {
 				const currentBeat = getCurrentBeat();
 				const fraction = currentBeat / TOTAL_BEATS;
+				if (fraction >= 1) {
+					if (loop) {
+						play();
+						return;
+					} else {
+						pause();
+						return;
+					}
+				}
 				setPlayheadPosition(fraction);
 
 				const nextBeats = getNextBeatsAfter(currentBeat);
@@ -118,12 +133,17 @@ export default function useAudioMidiPlayer(
 		});
 	}
 
+	//todo: playing for non-start
 	function play() {
+		setPlayedFirstBeat(false);
 		setIsPlaying(true);
+		songNoDrumsSample.currentTime = 0;
+		songNoDrumsSample.play();
 		setStartTime(Date.now());
 	}
 
 	function pause() {
+		songNoDrumsSample.pause();
 		setIsPlaying(false);
 		setPauseTime(Date.now());
 		setPlayedFirstBeat(false);
@@ -150,7 +170,7 @@ export default function useAudioMidiPlayer(
 	}
 
 	function getCurrentBeat() {
-		const elapsedTime =
+		const elapsedTime = // songNoDrumsSample.currentTime
 			((isPlaying ? Date.now() : pauseTime) - startTime) / 1000; // elapsed time in seconds
 		return (elapsedTime / 60) * bpm;
 	}

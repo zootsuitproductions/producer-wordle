@@ -4,28 +4,28 @@ import "../App.css";
 import KeyTimeline from "./KeyTimeline";
 import TopOfTimeline from "./TopOfTimeline";
 import Playhead from "./Playhead";
-import useAudioMidiPlayer from "../Hooks/useAudioPlayer";
+import useAudioMidiPlayer from "../Hooks/useAudioMidiPlayer";
+import useMidi from "../Hooks/useMidi";
+import useMidiEditorControls from "../Hooks/useMidiEditorControls";
 
 function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 	const MAX_LEFT = leftSidePosition;
 	const MIN_RIGHT = MAX_LEFT + minWidth;
-
 	const [pianoWidth, setPianoWidth] = useState(minWidth);
 	const [leftPosition, setLeftPosition] = useState(MAX_LEFT);
-	const [timeDivision, setTimeDivision] = useState(32);
-	const [penModeActivated, setPenModeActivated] = useState(false);
+	const [playheadPosition, setPlayheadPosition] = useState(0);
 
-	const [midiDataByNote, setMidiData] = useState(
-		keys.map((item) => {
-			return {};
-		})
-	);
-	const [midiDataSorted, setMidiDataSorted] = useState([]);
+	const {
+		midiDataByNote,
+		setMidiData,
+		addNoteAndClearSpaceAsNecessary,
+		midiDataSorted,
+		removeNote,
+	} = useMidi(keys);
 
-	const [bpm, setBpm] = useState(140);
+	const [bpm, setBpm] = useState(101);
 	const TOTAL_BEATS = 16;
 
-	const [playheadPosition, setPlayheadPosition] = useState(0);
 	const { togglePlay } = useAudioMidiPlayer(
 		midiDataSorted,
 		bpm,
@@ -33,59 +33,9 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		setPlayheadPosition
 	);
 
-	useEffect(() => {
-		// Function to convert midiDataByNote to midiDataSorted
-		const sortMidiDataByTime = () => {
-			let sortedData = [];
-			midiDataByNote.forEach((notes, noteIndex) => {
-				for (let startBeat in notes) {
-					sortedData.push({
-						note: noteIndex,
-						startBeat: parseFloat(startBeat) * 4,
-						endBeat: notes[startBeat],
-						velocity: 0.9, // Default velocity, adjust as necessary
-					});
-				}
-			});
-			sortedData.sort((a, b) => a.startBeat - b.startBeat);
-			console.log(sortedData);
-
-			setMidiDataSorted(sortedData);
-		};
-
-		sortMidiDataByTime();
-	}, [midiDataByNote]);
+	const { timeDivision, penModeActivated } = useMidiEditorControls(togglePlay);
 
 	//Todo: need to clarify timing of measures and beats. 0 should be 1st bar, 1 should be 2nd bar.
-
-	useEffect(() => {
-		const handleKeyPress = (event) => {
-			if (event.key === "2") {
-				console.log("2 key pressed");
-				setTimeDivision(timeDivision * 2);
-			} else if (event.key === "1") {
-				console.log("1 key pressed");
-				setTimeDivision(timeDivision / 2);
-			} else if (event.key === "b") {
-				const body = document.querySelector("body");
-				if (!penModeActivated) {
-					body.style.cursor = "crosshair";
-				} else {
-					body.style.cursor = "auto";
-				}
-
-				setPenModeActivated(!penModeActivated);
-			} else if (event.key === " ") {
-				togglePlay();
-			}
-		};
-
-		document.addEventListener("keydown", handleKeyPress);
-
-		return () => {
-			document.removeEventListener("keydown", handleKeyPress);
-		};
-	}, [timeDivision, penModeActivated, midiDataByNote, togglePlay]);
 
 	useEffect(() => {
 		const handleZoom = (e) => {
@@ -128,42 +78,30 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 	}, [pianoWidth, MAX_LEFT, MIN_RIGHT, leftPosition, minWidth]);
 
 	const containerStyle = {
-		width: `${pianoWidth}px`, // Assuming each key has a width of 100px
+		display: "flex",
+		width: `${pianoWidth}px`,
 		flexDirection: "column",
 		position: "absolute",
 		backgroundColor: "#4F4F4F",
 		left: `${leftPosition}px`,
 	};
 
-	const handleBeatClick = (keyIndex, beatIndex) => {
-		console.log("clicked " + keyIndex + beatIndex);
-	};
-
 	const renderKeyRows = () => {
-		const rows = [];
-		for (let i = keys.length - 1; i >= 0; i--) {
-			rows.push(
+		return keys.map((_, index) => {
+			return (
 				<KeyTimeline
 					numBeats={timeDivision}
-					onBeatClick={(beatIndex) => handleBeatClick(i, beatIndex)}
-					key={i}
-					keyNumber={i}
-					midiNotes={midiDataByNote[i]}
-					setMidiNotes={(newNotes) => {
-						console.log(midiDataByNote);
-						setMidiData((prevMidiData) => {
-							const newMidiData = [...prevMidiData]; // Create a shallow copy
-							newMidiData[i] = newNotes; // Update the copy with new notes
-							return newMidiData; // Return the updated state
-						});
-					}}
+					key={index}
+					keyNumber={index}
+					midiNotes={midiDataByNote[index]}
+					addNoteAndClearSpaceAsNecessary={addNoteAndClearSpaceAsNecessary}
+					removeNote={removeNote}
 					rowHeight={keyHeight}
 					width={pianoWidth}
 					penModeActivated={penModeActivated}
 				/>
 			);
-		}
-		return rows;
+		});
 	};
 
 	return (
@@ -173,7 +111,9 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 				positionFraction={playheadPosition}
 			/>
 			<TopOfTimeline timeDivision={timeDivision} />
-			{renderKeyRows()}
+			<div style={{ display: "flex", flexDirection: "column-reverse" }}>
+				{renderKeyRows()}
+			</div>
 		</div>
 	);
 }

@@ -7,64 +7,34 @@ import MidiBeat from "./MidiBeat";
 function KeyTimeline({
 	keyNumber,
 	numBeats,
-	onBeatClick,
 	width,
 	rowHeight,
 	midiNotes,
-	setMidiNotes,
+	addNoteAndClearSpaceAsNecessary,
 	penModeActivated = false,
 	numBars = 4,
+	removeNote,
 }) {
-	//dictionary from start time to end time of midi
-	// const [midiNotes, setMidiNotes] = useState({});
-
 	const [blackKey, setBlackKey] = useState(false);
 
 	// TODO:
-	// - playback
 	// - click and drag.
 
 	useEffect(() => {
 		setBlackKey(isBlackKey(keyNumber));
 	}, []);
 
-	const removeBeat = (startTime) => {
-		const newMidiNotes = { ...midiNotes };
-
-		if (newMidiNotes[startTime]) {
-			delete newMidiNotes[startTime];
-		}
-
-		setMidiNotes(newMidiNotes);
-	};
-
 	const handleClick = (index) => {
 		if (penModeActivated) {
-			addBeatAndClearSpaceAsNecessary(index);
+			penInNote(index);
 		}
 	};
 
-	// todo make timing object oriented and clear.
-	const addBeatAndClearSpaceAsNecessary = (index) => {
+	function penInNote(index) {
 		const startOfBeat = numBars * (index / numBeats);
 		const endOfBeat = numBars * ((index + 1) / numBeats);
-
-		const newMidiNotes = { ...midiNotes };
-
-		let startTimes = Object.keys(newMidiNotes).map((key) => parseFloat(key));
-
-		//find and remove any times in startTimes that are within range startOfBeat to endOfBeat
-		startTimes.forEach(function (startTime) {
-			console.log(startTime);
-			if (startTime >= startOfBeat && startTime < endOfBeat) {
-				delete newMidiNotes[startTime];
-			}
-		});
-
-		newMidiNotes[startOfBeat] = endOfBeat;
-
-		setMidiNotes(newMidiNotes);
-	};
+		addNoteAndClearSpaceAsNecessary(keyNumber, startOfBeat, endOfBeat);
+	}
 
 	const isBeatInLightColorSection = (index) => {
 		return (index % (numBeats / 2)) / numBeats >= 0.25;
@@ -90,7 +60,8 @@ function KeyTimeline({
 			{Array.from({ length: numBeats }).map((_, index) => (
 				<div
 					key={index}
-					onDoubleClick={() => addBeatAndClearSpaceAsNecessary(index)}
+					onDoubleClick={() => penInNote(index)}
+					b
 					onClick={() => handleClick(index)}
 					className={`Beat ${getBeatClass(index, blackKey)}`}
 				></div>
@@ -102,7 +73,7 @@ function KeyTimeline({
 					endTime={endTime}
 					width={width}
 					rowHeight={rowHeight}
-					removeBeat={removeBeat}
+					removeBeat={() => removeNote(keyNumber, startTime)}
 					penModeActivated={penModeActivated}
 					numBars={numBars}
 				/>

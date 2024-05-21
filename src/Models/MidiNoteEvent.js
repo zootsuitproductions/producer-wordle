@@ -1,4 +1,4 @@
-class MidiNote {
+class MidiNoteEvent {
 	constructor({ note, startBeat, endBeat, velocity = 0.9, correct = true }) {
 		this.note = note; // MIDI note number
 		this.startBeat = startBeat; // Start beat of the note
@@ -8,4 +8,4 @@ class MidiNote {
 	}
 }
 
-export default MidiNote;
+export default MidiNoteEvent;

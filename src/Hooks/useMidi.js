@@ -1,16 +1,18 @@
 // useMidi.js
 import { useState, useEffect } from "react";
-import MidiNote from "../Models/MidiNote";
+import MidiNoteEvent from "../Models/MidiNoteEvent";
 
 const useMidi = (keys) => {
-	const [midiDataByNote, setMidiData] = useState(keys.map(() => []));
+	const [keytracksData, setMidiData] = useState(keys.map(() => []));
 	const [midiDataSorted, setMidiDataSorted] = useState([]);
+	//todo: SSoT. dekete midiDataByNote.
+	// insert into sorted every time, expose a method to get the single key notes list,
 
 	useEffect(() => {
 		const sortMidiDataByTime = () => {
 			let sortedData = [];
 
-			midiDataByNote.forEach((keyNotes, noteIndex) => {
+			keytracksData.forEach((keyNotes) => {
 				keyNotes.forEach((note) => {
 					sortedData.push(note);
 				});
@@ -23,21 +25,18 @@ const useMidi = (keys) => {
 		};
 
 		sortMidiDataByTime();
-	}, [midiDataByNote]);
+	}, [keytracksData]);
 
 	// todo make timing object oriented and clear.
 	function addNoteAndClearSpaceAsNecessary(keyIndex, startOfBeat, endOfBeat) {
-		console.log(midiDataByNote);
-		// const newMidiNotesOnThisKey = { ...midiDataByNote[keyIndex] };
-
-		const newKeyNotes = [...midiDataByNote[keyIndex]];
+		const newKeyNotes = [...keytracksData[keyIndex]];
 		newKeyNotes.filter((midiNote) => {
 			const startBeat = midiNote.startBeat;
 			return !(startBeat >= startOfBeat && startBeat < endOfBeat);
 		});
 
 		newKeyNotes.push(
-			new MidiNote({
+			new MidiNoteEvent({
 				note: keyIndex, // MIDI note number (e.g., 60 for Middle C)
 				startBeat: startOfBeat, // Start beat of the note
 				endBeat: endOfBeat, // End beat of the note
@@ -52,7 +51,7 @@ const useMidi = (keys) => {
 	}
 
 	function removeNote(keyIndex, startTime) {
-		const newKeyNotes = [...midiDataByNote[keyIndex]];
+		const newKeyNotes = [...keytracksData[keyIndex]];
 
 		const noteIndex = newKeyNotes.findIndex(
 			(note) => note.startBeat === startTime
@@ -70,8 +69,14 @@ const useMidi = (keys) => {
 		}
 	}
 
+	function checkForCorrectness(correctKeytracksData) {
+		correctKeytracksData.forEach((keytrack, noteIndex) => {
+			keytracksData[noteIndex].correctAgainst(keytrack);
+		});
+	}
+
 	return {
-		midiDataByNote,
+		midiDataByNote: keytracksData,
 		setMidiData,
 		addNoteAndClearSpaceAsNecessary,
 		removeNote,

@@ -1,25 +1,23 @@
 // useMidi.js
 import { useState, useEffect } from "react";
+import MidiNote from "../Models/MidiNote";
 
 const useMidi = (keys) => {
-	const [midiDataByNote, setMidiData] = useState(keys.map(() => ({})));
+	const [midiDataByNote, setMidiData] = useState(keys.map(() => []));
 	const [midiDataSorted, setMidiDataSorted] = useState([]);
 
 	useEffect(() => {
 		const sortMidiDataByTime = () => {
 			let sortedData = [];
-			midiDataByNote.forEach((notes, noteIndex) => {
-				for (let startBeat in notes) {
-					sortedData.push({
-						note: noteIndex,
-						startBeat: parseFloat(startBeat) * 4,
-						endBeat: notes[startBeat],
-						velocity: 0.9, // Default velocity, adjust as necessary
-					});
-				}
+
+			midiDataByNote.forEach((keyNotes, noteIndex) => {
+				keyNotes.forEach((note) => {
+					sortedData.push(note);
+				});
 			});
+
+			// Sort the data by startBeat
 			sortedData.sort((a, b) => a.startBeat - b.startBeat);
-			console.log(sortedData);
 
 			setMidiDataSorted(sortedData);
 		};
@@ -29,39 +27,47 @@ const useMidi = (keys) => {
 
 	// todo make timing object oriented and clear.
 	function addNoteAndClearSpaceAsNecessary(keyIndex, startOfBeat, endOfBeat) {
-		const newMidiNotes = { ...midiDataByNote[keyIndex] };
+		console.log(midiDataByNote);
+		// const newMidiNotesOnThisKey = { ...midiDataByNote[keyIndex] };
 
-		let startTimes = Object.keys(newMidiNotes).map((key) => parseFloat(key));
-
-		//find and remove any times in startTimes that are within range startOfBeat to endOfBeat
-		startTimes.forEach(function (startTime) {
-			console.log(startTime);
-			if (startTime >= startOfBeat && startTime < endOfBeat) {
-				delete newMidiNotes[startTime];
-			}
+		const newKeyNotes = [...midiDataByNote[keyIndex]];
+		newKeyNotes.filter((midiNote) => {
+			const startBeat = midiNote.startBeat;
+			return !(startBeat >= startOfBeat && startBeat < endOfBeat);
 		});
 
-		newMidiNotes[startOfBeat] = endOfBeat;
+		newKeyNotes.push(
+			new MidiNote({
+				note: keyIndex, // MIDI note number (e.g., 60 for Middle C)
+				startBeat: startOfBeat, // Start beat of the note
+				endBeat: endOfBeat, // End beat of the note
+			})
+		);
 
 		setMidiData((prevMidiData) => {
 			const newMidiData = [...prevMidiData]; // Create a shallow copy
-			newMidiData[keyIndex] = newMidiNotes; // Update the copy with new notes
+			newMidiData[keyIndex] = newKeyNotes; // Update the copy with new notes
 			return newMidiData; // Return the updated state
 		});
 	}
 
 	function removeNote(keyIndex, startTime) {
-		const newMidiNotes = { ...midiDataByNote[keyIndex] };
+		const newKeyNotes = [...midiDataByNote[keyIndex]];
 
-		if (newMidiNotes[startTime]) {
-			delete newMidiNotes[startTime];
+		const noteIndex = newKeyNotes.findIndex(
+			(note) => note.startBeat === startTime
+		);
+
+		// If the note is found, remove it from the array
+		if (noteIndex !== -1) {
+			newKeyNotes.splice(noteIndex, 1);
+
+			setMidiData((prevMidiData) => {
+				const newMidiData = [...prevMidiData]; // Create a shallow copy
+				newMidiData[keyIndex] = newKeyNotes; // Update the copy with new notes
+				return newMidiData; // Return the updated state
+			});
 		}
-
-		setMidiData((prevMidiData) => {
-			const newMidiData = [...prevMidiData]; // Create a shallow copy
-			newMidiData[keyIndex] = newMidiNotes; // Update the copy with new notes
-			return newMidiData; // Return the updated state
-		});
 	}
 
 	return {

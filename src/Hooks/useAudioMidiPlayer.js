@@ -11,7 +11,7 @@ const audioSamples = [
 const songNoDrumsSample = new Audio("end of the road boys no drums.wav");
 
 export default function useAudioMidiPlayer(
-	data,
+	midiDataSorted,
 	bpm,
 	TOTAL_BEATS,
 	setPlayheadPosition,
@@ -87,13 +87,13 @@ export default function useAudioMidiPlayer(
 
 	function getNextBeatsAfter(currentBeat) {
 		let left = 0;
-		let right = data.length - 1;
+		let right = midiDataSorted.length - 1;
 		let result = -1;
 
 		while (left <= right) {
 			const mid = Math.floor((left + right) / 2);
 
-			if (data[mid].startBeat > currentBeat) {
+			if (midiDataSorted[mid].startBeat > currentBeat) {
 				result = mid;
 				right = mid - 1; // Search in the left half
 			} else {
@@ -105,13 +105,13 @@ export default function useAudioMidiPlayer(
 			return null;
 		}
 
-		const nextBeatStart = data[result].startBeat;
-		const nextBeats = [data[result]];
+		const nextBeatStart = midiDataSorted[result].startBeat;
+		const nextBeats = [midiDataSorted[result]];
 
 		// Collect all events that occur at the same startBeat
-		for (let i = result + 1; i < data.length; i++) {
-			if (data[i].startBeat === nextBeatStart) {
-				nextBeats.push(data[i]);
+		for (let i = result + 1; i < midiDataSorted.length; i++) {
+			if (midiDataSorted[i].startBeat === nextBeatStart) {
+				nextBeats.push(midiDataSorted[i]);
 			} else {
 				break;
 			}

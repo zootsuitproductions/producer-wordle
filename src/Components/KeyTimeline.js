@@ -6,13 +6,12 @@ import MidiBeat from "./MidiBeat";
 
 function KeyTimeline({
 	keyNumber,
-	numBeats,
 	width,
 	rowHeight,
 	midiNotes,
 	addNoteAndClearSpaceAsNecessary,
 	penModeActivated = false,
-	numBars = 4,
+	numBeats = 16,
 	removeNote,
 }) {
 	const [blackKey, setBlackKey] = useState(false);
@@ -31,8 +30,8 @@ function KeyTimeline({
 	};
 
 	function penInNote(index) {
-		const startOfBeat = numBars * (index / numBeats);
-		const endOfBeat = numBars * ((index + 1) / numBeats);
+		const startOfBeat = numBeats * (index / numBeats);
+		const endOfBeat = numBeats * ((index + 1) / numBeats);
 		addNoteAndClearSpaceAsNecessary(keyNumber, startOfBeat, endOfBeat);
 	}
 
@@ -67,15 +66,15 @@ function KeyTimeline({
 				></div>
 			))}
 
-			{Object.entries(midiNotes).map(([startTime, endTime]) => (
+			{midiNotes.map((midiNote) => (
 				<MidiBeat
-					startTime={startTime}
-					endTime={endTime}
+					startTime={midiNote.startBeat}
+					endTime={midiNote.endBeat}
 					width={width}
 					rowHeight={rowHeight}
-					removeBeat={() => removeNote(keyNumber, startTime)}
+					removeBeat={() => removeNote(keyNumber, midiNote.startBeat)}
 					penModeActivated={penModeActivated}
-					numBars={numBars}
+					numBars={numBeats}
 				/>
 			))}
 		</div>

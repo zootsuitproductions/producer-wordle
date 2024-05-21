@@ -90,7 +90,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		return keys.map((_, index) => {
 			return (
 				<KeyTimeline
-					numBeats={timeDivision}
+					numBeats={TOTAL_BEATS}
 					key={index}
 					keyNumber={index}
 					midiNotes={midiDataByNote[index]}

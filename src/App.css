@@ -58,3 +58,33 @@ html {
   position: absolute;
   /* left: 300px; */
 }
+
+.audio-player-container {
+  padding: 20px;
+  
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: white;
+}
+
+.audio-player-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.play-icon {
+  width: 35px;
+  margin-left: 4px;
+}
+
+.pause-icon {
+  width: 35px;
+  /* margin-left: 0px; */
+}

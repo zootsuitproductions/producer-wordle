@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 
-const audioSamples = [
-	new Audio("cc kick.wav"),
-	new Audio("[SAINT6] Bounce Clap.wav"),
-];
+// const audioSamples = [
+// 	new Audio("cc kick.wav"),
+// 	new Audio("[SAINT6] Bounce Clap.wav"),
+// ];
 
 // going to need to do synchronized playback with buffers and shit
 //use the song playback position as the guide for the midi notes
@@ -11,12 +11,22 @@ const audioSamples = [
 const songNoDrumsSample = new Audio("end of the road boys no drums.wav");
 
 export default function useAudioMidiPlayer(
+	sampleFiles,
 	midiDataSorted,
 	bpm,
 	TOTAL_BEATS,
 	setPlayheadPosition,
 	loop = true
 ) {
+	const [audioSamples, setAudioSamples] = useState(
+		sampleFiles.map((sample) => new Audio(sample))
+	);
+
+	useEffect(() => {
+		// Initialize audio samples when sampleFiles changes
+		setAudioSamples(sampleFiles.map((sample) => new Audio(sample)));
+	}, [sampleFiles]);
+
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [playedFirstBeat, setPlayedFirstBeat] = useState(false);
 	const timeoutsRef = useRef([]);
@@ -138,6 +148,7 @@ export default function useAudioMidiPlayer(
 		setPlayedFirstBeat(false);
 		setIsPlaying(true);
 		songNoDrumsSample.currentTime = 0;
+		songNoDrumsSample.volume = 0.5;
 		songNoDrumsSample.play();
 		setStartTime(Date.now());
 	}

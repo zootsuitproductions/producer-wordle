@@ -8,7 +8,7 @@ import useAudioMidiPlayer from "../Hooks/useAudioMidiPlayer";
 import useMidi from "../Hooks/useMidi";
 import useMidiEditorControls from "../Hooks/useMidiEditorControls";
 
-function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
+function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 	const MAX_LEFT = leftSidePosition;
 	const MIN_RIGHT = MAX_LEFT + minWidth;
 	const [pianoWidth, setPianoWidth] = useState(minWidth);
@@ -22,12 +22,13 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 		checkForCorrectness,
 		saveToLocalStorage,
 		removeNote,
-	} = useMidi(keys);
+	} = useMidi(sampleFiles);
 
 	const [bpm, setBpm] = useState(101);
 	const TOTAL_BEATS = 16;
 
 	const { togglePlay } = useAudioMidiPlayer(
+		sampleFiles,
 		midiDataSorted,
 		bpm,
 		TOTAL_BEATS,
@@ -90,7 +91,7 @@ function MidiTimeline({ keys, leftSidePosition, keyHeight, minWidth }) {
 	};
 
 	const renderKeyRows = () => {
-		return keys.map((_, index) => {
+		return sampleFiles.map((_, index) => {
 			console.log(timeDivision);
 			return (
 				<KeyTimeline

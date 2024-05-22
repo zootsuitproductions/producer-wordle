@@ -15,9 +15,10 @@ export default function useAudioMidiPlayer(
 	midiDataSorted,
 	bpm,
 	TOTAL_BEATS,
-	setPlayheadPosition,
 	loop = true
 ) {
+	// const [playheadPosition, setPlayheadPosition] = useState(0);
+
 	const [audioSamples, setAudioSamples] = useState(
 		sampleFiles.map((sample) => new Audio(sample))
 	);
@@ -71,17 +72,18 @@ export default function useAudioMidiPlayer(
 						return;
 					}
 				}
-				setPlayheadPosition(fraction);
-
+				// setPlayheadPosition(fraction);
 				const nextBeats = getNextBeatsAfter(currentBeat);
 				if (nextBeats) {
 					if (nextBeats[0].startBeat !== nextScheduledBeatTime) {
 						const nextBeatTime = ((nextBeats[0].startBeat * 60) / bpm) * 1000;
-						const currentTime = Date.now() - startTime;
-						const timeUntilNextBeat = nextBeatTime - currentTime;
+						const currentTime = songNoDrumsSample.currentTime * 1000;
 
-						if (timeUntilNextBeat <= 60) {
-							scheduleBeats(nextBeats, timeUntilNextBeat);
+						// Date.now() - startTime;
+						const timeUntilNextBeat = nextBeatTime - currentTime;
+						if (timeUntilNextBeat <= 90) {
+							// this is fried rn
+							scheduleBeats(nextBeats, 0);
 						}
 					}
 				}
@@ -93,7 +95,7 @@ export default function useAudioMidiPlayer(
 				clearInterval(intervalId); // Cleanup interval on component unmount
 			};
 		}
-	}, [getCurrentBeat, isPlaying]);
+	}, [TOTAL_BEATS, getCurrentBeat, isPlaying]);
 
 	function getNextBeatsAfter(currentBeat) {
 		let left = 0;
@@ -148,7 +150,7 @@ export default function useAudioMidiPlayer(
 		setPlayedFirstBeat(false);
 		setIsPlaying(true);
 		songNoDrumsSample.currentTime = 0;
-		songNoDrumsSample.volume = 0.5;
+		songNoDrumsSample.volume = 0.6;
 		songNoDrumsSample.play();
 		setStartTime(Date.now());
 	}
@@ -181,12 +183,14 @@ export default function useAudioMidiPlayer(
 	}
 
 	function getCurrentBeat() {
-		const elapsedTime = // songNoDrumsSample.currentTime
-			((isPlaying ? Date.now() : pauseTime) - startTime) / 1000; // elapsed time in seconds
+		const elapsedTime = songNoDrumsSample.currentTime;
+		// ((isPlaying ? Date.now() : pauseTime) - startTime) / 1000; // elapsed time in seconds
 		return (elapsedTime / 60) * bpm;
 	}
 
 	return {
 		togglePlay,
+		isPlaying,
+		getCurrentBeat,
 	};
 }

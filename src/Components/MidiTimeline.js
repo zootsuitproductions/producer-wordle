@@ -7,13 +7,14 @@ import Playhead from "./Playhead";
 import useAudioMidiPlayer from "../Hooks/useAudioMidiPlayer";
 import useMidi from "../Hooks/useMidi";
 import useMidiEditorControls from "../Hooks/useMidiEditorControls";
+import KeyRows from "./KeyRows";
 
 function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 	const MAX_LEFT = leftSidePosition;
 	const MIN_RIGHT = MAX_LEFT + minWidth;
 	const [pianoWidth, setPianoWidth] = useState(minWidth);
 	const [leftPosition, setLeftPosition] = useState(MAX_LEFT);
-	const [playheadPosition, setPlayheadPosition] = useState(0);
+	// const [playheadPosition, setPlayheadPosition] = useState(0);
 
 	const {
 		midiDataByNote,
@@ -27,12 +28,12 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 	const [bpm, setBpm] = useState(101);
 	const TOTAL_BEATS = 16;
 
-	const { togglePlay } = useAudioMidiPlayer(
+	const { togglePlay, isPlaying, getCurrentBeat } = useAudioMidiPlayer(
 		sampleFiles,
 		midiDataSorted,
 		bpm,
-		TOTAL_BEATS,
-		setPlayheadPosition
+		TOTAL_BEATS
+		// setPlayheadPosition
 	);
 
 	const { timeDivision, penModeActivated } = useMidiEditorControls(
@@ -90,36 +91,26 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 		left: `${leftPosition}px`,
 	};
 
-	const renderKeyRows = () => {
-		return sampleFiles.map((_, index) => {
-			console.log(timeDivision);
-			return (
-				<KeyTimeline
-					timeDivision={timeDivision}
-					numBeats={TOTAL_BEATS}
-					key={index}
-					keyNumber={index}
-					midiNotes={midiDataByNote[index]}
-					addNoteAndClearSpaceAsNecessary={addNoteAndClearSpaceAsNecessary}
-					removeNote={removeNote}
-					rowHeight={keyHeight}
-					width={pianoWidth}
-					penModeActivated={penModeActivated}
-				/>
-			);
-		});
-	};
-
 	return (
 		<div style={containerStyle}>
 			<Playhead
+				// positionFraction={playheadPosition}
 				timelineWidth={pianoWidth}
-				positionFraction={playheadPosition}
+				getCurrentPosition={() => getCurrentBeat() / TOTAL_BEATS}
+				isPlaying={isPlaying}
 			/>
 			<TopOfTimeline timeDivision={timeDivision} />
-			<div style={{ display: "flex", flexDirection: "column-reverse" }}>
-				{renderKeyRows()}
-			</div>
+			<KeyRows
+				sampleFiles={sampleFiles}
+				TOTAL_BEATS={TOTAL_BEATS}
+				timeDivision={timeDivision}
+				midiDataByNote={midiDataByNote}
+				addNoteAndClearSpaceAsNecessary={addNoteAndClearSpaceAsNecessary}
+				removeNote={removeNote}
+				keyHeight={keyHeight}
+				pianoWidth={pianoWidth}
+				penModeActivated={penModeActivated}
+			/>
 		</div>
 	);
 }

@@ -9,14 +9,15 @@ function KeysColumn({ keys, keyWidth, keyPlusSampleWidth = 200, keyHeight }) {
 	var keysDisplay = [];
 
 	function getFileNameFromPath(path) {
-		if (path instanceof String) {
-			const parts = path.split("/");
+		// return path;
+		// if (path instanceof String) {
+		const parts = path.split("/");
 
-			// Get the last part of the split path, which is the file name
-			const fileName = parts[parts.length - 1];
+		// Get the last part of the split path, which is the file name
+		const fileName = parts[parts.length - 1];
 
-			return fileName.split(".")[0];
-		}
+		return fileName.split(".")[0];
+		// }
 		// Split the path by the directory separator (e.g., '/')
 
 		// return fileName;

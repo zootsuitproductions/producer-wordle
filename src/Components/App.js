@@ -6,19 +6,14 @@ import PianoRoll from "./PianoRoll";
 import CorrectAudioPlayer from "./CorrectAudioPlayer";
 
 function App() {
+	//todo this is bad
 	const [sampleFiles, setSampleFiles] = useState([
-		"cc kick.wav",
+		"/cc kick.wav",
 		"/end of the road boyz samples/eotrb Snare.wav",
-		3,
-		4,
-		5,
-		6,
-		7,
-		8,
-		9,
-		10,
-		11,
-		12,
+		"/end of the road boyz samples/eotrb Snare.wav",
+		"/end of the road boyz samples/eotrb Snare.wav",
+		"/end of the road boyz samples/eotrb Snare.wav",
+		"/end of the road boyz samples/eotrb Snare.wav",
 	]);
 	//on itialization, load all samples into an array from a folder in public called end of the road boys samples
 	useEffect(() => {
@@ -28,10 +23,10 @@ function App() {
 			// todo:::^^^
 
 			const sampleNames = [
-				// "Hi Hat.wav",
-				// "Kick.wav",
-				// "Low Hat.wav",
-				// "Snare Hi.wav",
+				"Hi Hat.wav",
+				"Kick.wav",
+				"Low Hat.wav",
+				"Snare Hi.wav",
 				"Snare.wav",
 				// Add more sample file names here
 			];

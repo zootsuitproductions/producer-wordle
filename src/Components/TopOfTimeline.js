@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import "../CSS/TopOfTimeline.css";
 
 function TopOfTimeline({ width, timeDivision, height = 60 }) {
@@ -20,6 +20,8 @@ function TopOfTimeline({ width, timeDivision, height = 60 }) {
 		return displayTime;
 	};
 
+	console.log("re render!!");
+
 	return (
 		<div className="Row-container" style={{ height: height }}>
 			{Array.from({ length: timeDivision / 2 }).map((_, index) => (
@@ -29,4 +31,4 @@ function TopOfTimeline({ width, timeDivision, height = 60 }) {
 	);
 }
 
-export default TopOfTimeline;
+export default memo(TopOfTimeline);

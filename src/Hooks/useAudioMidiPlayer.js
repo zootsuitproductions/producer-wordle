@@ -12,6 +12,36 @@ export default function useAudioMidiPlayer(
 	TOTAL_BEATS,
 	loop = true
 ) {
+	const prevMidiDataRef = useRef([]);
+
+	useEffect(() => {
+		const prevMidiData = prevMidiDataRef.current;
+
+		const newMidiData = midiDataSorted.filter(
+			(event) => !prevMidiData.some((prevEvent) => prevEvent.id === event.id)
+		);
+		const removedMidiData = prevMidiData.filter(
+			(event) =>
+				!midiDataSorted.some((currentEvent) => currentEvent.id === event.id)
+		);
+
+		newMidiData.forEach((event) => {
+			scheduleMidiNoteEvent(startTime, event);
+		});
+
+		removedMidiData.forEach((event) => {
+			try {
+				noteSources.current[event.id].stop();
+			} catch (error) {
+				console.warn("Source already stopped:", error);
+			}
+			delete noteSources.current[event.id];
+		});
+
+		// Update the previous midiDataSorted reference
+		prevMidiDataRef.current = midiDataSorted;
+	}, [midiDataSorted]);
+
 	const [audioSamples, setAudioSamples] = useState(
 		sampleFiles.map((sample) => new Audio(sample))
 	);
@@ -21,15 +51,18 @@ export default function useAudioMidiPlayer(
 		setAudioSamples(sampleFiles.map((sample) => new Audio(sample)));
 	}, [sampleFiles]);
 
-	const [audioContext, setAudioContext] = useState(
+	const [audioContext] = useState(
 		() => new (window.AudioContext || window.webkitAudioContext)()
 	);
-	const activeSources = useRef([]);
 
 	const [startTime, setStartTime] = useState(0);
 
 	const [audioBuffers, setAudioBuffers] = useState([]);
+
+	const noteSources = useRef({});
+
 	const [noDrumsBuffer, setNoDrumsBuffer] = useState(null);
+	const noDrumsSource = useRef(null);
 
 	useEffect(() => {
 		async function fetchAudioBuffers() {
@@ -50,34 +83,49 @@ export default function useAudioMidiPlayer(
 		fetchAudioBuffers();
 	}, [audioContext, sampleFiles]);
 
+	function playNoDrums(currentTime) {
+		try {
+			noDrumsSource.current.stop();
+		} catch {}
+
+		noDrumsSource.current = audioContext.createBufferSource();
+		noDrumsSource.current.buffer = noDrumsBuffer;
+		noDrumsSource.current.connect(audioContext.destination);
+		noDrumsSource.current.start(currentTime);
+	}
+
+	function scheduleMidiNoteEvent(currentTime, event) {
+		const { startBeat, note, id } = event;
+		const beatStartSeconds = (startBeat * 60) / bpm;
+
+		const source = audioContext.createBufferSource();
+		source.buffer = audioBuffers[note];
+		source.connect(audioContext.destination);
+		source.start(currentTime + beatStartSeconds);
+
+		noteSources.current[id] = source;
+	}
+
+	//todo:: when a new note is added or removed need to
+
 	const scheduleMIDIPlayback = () => {
 		const currentTime = audioContext.currentTime;
-
-		const newSources = midiDataSorted.map((event) => {
-			const { startBeat, note } = event;
-			const beatStartSeconds = (startBeat * 60) / bpm;
-
-			const source = audioContext.createBufferSource();
-			source.buffer = audioBuffers[note];
-			source.connect(audioContext.destination);
-			source.start(currentTime + beatStartSeconds);
-
-			return source;
+		stopAllScheduledNotes(); // I don't know why i need this but i do.
+		playNoDrums(currentTime);
+		midiDataSorted.forEach((event) => {
+			scheduleMidiNoteEvent(currentTime, event);
 		});
-
-		// Update state with new source nodes
-		activeSources.current.push(...newSources);
 	};
 
 	const stopAllScheduledNotes = () => {
-		activeSources.current.forEach((source) => {
+		Object.values(noteSources.current).forEach((source) => {
 			try {
 				source.stop();
 			} catch (error) {
 				console.warn("Source already stopped:", error);
 			}
 		});
-		activeSources.current = []; // Clear the ref
+		noteSources.current = {}; // Clear the ref
 	};
 
 	// const [isPlaying, setIsPlaying] = useState(false);
@@ -219,6 +267,7 @@ export default function useAudioMidiPlayer(
 	function pause() {
 		console.log("pausing");
 		stopAllScheduledNotes();
+		noDrumsSource.current.stop();
 		// audioContext.suspend();
 		// stopNoDrums();
 		// songNoDrumsSample.pause();

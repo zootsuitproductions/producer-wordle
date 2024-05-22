@@ -1,10 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 
-// const audioSamples = [
-// 	new Audio("cc kick.wav"),
-// 	new Audio("[SAINT6] Bounce Clap.wav"),
-// ];
-
 // going to need to do synchronized playback with buffers and shit
 //use the song playback position as the guide for the midi notes
 
@@ -17,8 +12,6 @@ export default function useAudioMidiPlayer(
 	TOTAL_BEATS,
 	loop = true
 ) {
-	// const [playheadPosition, setPlayheadPosition] = useState(0);
-
 	const [audioSamples, setAudioSamples] = useState(
 		sampleFiles.map((sample) => new Audio(sample))
 	);
@@ -28,12 +21,72 @@ export default function useAudioMidiPlayer(
 		setAudioSamples(sampleFiles.map((sample) => new Audio(sample)));
 	}, [sampleFiles]);
 
+	const [audioContext, setAudioContext] = useState(
+		() => new (window.AudioContext || window.webkitAudioContext)()
+	);
+	const activeSources = useRef([]);
+
+	const [startTime, setStartTime] = useState(0);
+
+	const [audioBuffers, setAudioBuffers] = useState([]);
+	const [noDrumsBuffer, setNoDrumsBuffer] = useState(null);
+
+	useEffect(() => {
+		async function fetchAudioBuffers() {
+			const buffers = await Promise.all(
+				sampleFiles.map(async (sample) => {
+					const response = await fetch(sample);
+					const arrayBuffer = await response.arrayBuffer();
+					return await audioContext.decodeAudioData(arrayBuffer);
+				})
+			);
+			setAudioBuffers(buffers);
+			// Fetch and decode the no-drums sample
+			const response = await fetch("end of the road boys no drums.wav");
+			const arrayBuffer = await response.arrayBuffer();
+			const decodedBuffer = await audioContext.decodeAudioData(arrayBuffer);
+			setNoDrumsBuffer(decodedBuffer);
+		}
+		fetchAudioBuffers();
+	}, [audioContext, sampleFiles]);
+
+	const scheduleMIDIPlayback = () => {
+		const currentTime = audioContext.currentTime;
+
+		const newSources = midiDataSorted.map((event) => {
+			const { startBeat, note } = event;
+			const beatStartSeconds = (startBeat * 60) / bpm;
+
+			const source = audioContext.createBufferSource();
+			source.buffer = audioBuffers[note];
+			source.connect(audioContext.destination);
+			source.start(currentTime + beatStartSeconds);
+
+			return source;
+		});
+
+		// Update state with new source nodes
+		activeSources.current.push(...newSources);
+	};
+
+	const stopAllScheduledNotes = () => {
+		activeSources.current.forEach((source) => {
+			try {
+				source.stop();
+			} catch (error) {
+				console.warn("Source already stopped:", error);
+			}
+		});
+		activeSources.current = []; // Clear the ref
+	};
+
+	// const [isPlaying, setIsPlaying] = useState(false);
+
+	// const [playheadPosition, setPlayheadPosition] = useState(0);
+
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [playedFirstBeat, setPlayedFirstBeat] = useState(false);
 	const timeoutsRef = useRef([]);
-
-	const [startTime, setStartTime] = useState(0);
-	const [pauseTime, setPauseTime] = useState(0);
 
 	//todo:
 	// There is a bug with scheduling,
@@ -147,26 +200,38 @@ export default function useAudioMidiPlayer(
 
 	//todo: playing for non-start
 	function play() {
-		setPlayedFirstBeat(false);
-		setIsPlaying(true);
-		songNoDrumsSample.currentTime = 0;
-		songNoDrumsSample.volume = 0.6;
-		songNoDrumsSample.play();
-		setStartTime(Date.now());
+		setStartTime(audioContext.currentTime);
+		scheduleMIDIPlayback();
+		// setPlayedFirstBeat(false);
+		// setIsPlaying(true);
+		// songNoDrumsSample.currentTime = 0;
+		// songNoDrumsSample.volume = 0.6;
+		// songNoDrumsSample.play();
 	}
 
+	const resetAudioContext = () => {
+		stopAllScheduledNotes();
+		// const newAudioContext = new (window.AudioContext ||
+		// 	window.webkitAudioContext)();
+		// setAudioContext(newAudioContext);
+	};
+
 	function pause() {
-		songNoDrumsSample.pause();
-		setIsPlaying(false);
-		setPauseTime(Date.now());
-		setPlayedFirstBeat(false);
-		clearAllTimeouts();
+		console.log("pausing");
+		stopAllScheduledNotes();
+		// audioContext.suspend();
+		// stopNoDrums();
+		// songNoDrumsSample.pause();
+		// setIsPlaying(false);
+		// setPlayedFirstBeat(false);
+		// clearAllTimeouts();
 	}
 
 	function playMidiNote(note) {
 		const sample = audioSamples[note % audioSamples.length];
 		sample.currentTime = 0;
-		sample.play();
+		// sample.play();
+		// playSample(note);
 	}
 
 	function playFirstNoteTimeZero() {
@@ -183,7 +248,8 @@ export default function useAudioMidiPlayer(
 	}
 
 	function getCurrentBeat() {
-		const elapsedTime = songNoDrumsSample.currentTime;
+		const elapsedTime = audioContext.currentTime - startTime;
+		// songNoDrumsSample.currentTime;
 		// ((isPlaying ? Date.now() : pauseTime) - startTime) / 1000; // elapsed time in seconds
 		return (elapsedTime / 60) * bpm;
 	}

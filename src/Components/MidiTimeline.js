@@ -73,6 +73,21 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 				setPianoWidth(newPianoWidth);
 				setLeftPosition(newLeftPosition);
 			}
+			if (e.deltaX !== 0) {
+				e.preventDefault();
+			}
+			setLeftPosition((prevLeft) => {
+				const newPos = prevLeft - e.deltaX;
+				// return newPos;
+				if (newPos > MAX_LEFT) {
+					return MAX_LEFT;
+				} else if (newPos + pianoWidth < MIN_RIGHT) {
+					return MIN_RIGHT - pianoWidth;
+				} else {
+					return newPos;
+				}
+			});
+			// console.log(e.deltaX);
 		};
 
 		document.addEventListener("wheel", handleZoom, { passive: false });

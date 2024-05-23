@@ -12,7 +12,9 @@ function KeyRows({
 	pianoWidth,
 	penModeActivated,
 }) {
-	const [mouseDown, setMouseDown] = useState(false);
+	const [penDragging, setPenDragging] = useState(false);
+	const [erasing, setErasing] = useState(false);
+
 	const [keyRowClicked, setKeyRowClicked] = useState(0);
 
 	function penInNote(keyNumber, index) {
@@ -27,11 +29,19 @@ function KeyRows({
 	const [currentlyHoveredIndex, setCurrentlyHoveredIndex] = useState(null);
 
 	function handleMouseMove(event) {
-		if (mouseDown) {
+		if (penDragging) {
 			const index = getBeatIndexOfMouse(event);
 			if (index !== currentlyHoveredIndex) {
 				setCurrentlyHoveredIndex(index);
 				penInNote(keyRowClicked, index);
+			}
+		} else if (erasing) {
+			const index = getBeatIndexOfMouse(event);
+			if (index !== currentlyHoveredIndex) {
+				setCurrentlyHoveredIndex(index);
+
+				const startOfBeat = (TOTAL_BEATS * index) / timeDivision;
+				removeNote(keyRowClicked, startOfBeat);
 			}
 		}
 	}
@@ -42,11 +52,6 @@ function KeyRows({
 		const beatWidth = rect.width / timeDivision;
 		return Math.floor(x / beatWidth);
 	}
-	//check if they leave the bounding rect/dont unclick properly. need to reset
-
-	//ADDING DUPLICATES!. ALSO in keytimeline!
-
-	//check if there is a beat in the way, stop. also. do removal
 
 	function handleMouseDown(event, keyRowClicked, index) {
 		if (penModeActivated) {
@@ -55,18 +60,37 @@ function KeyRows({
 			penInNote(keyRowClicked, index);
 			setKeyRowClicked(keyRowClicked);
 			setCurrentlyHoveredIndex(index);
-			setMouseDown(true);
+			setPenDragging(true);
 		}
 	}
 
 	function handleMouseUp() {
-		setMouseDown(false);
+		setPenDragging(false);
+		setErasing(false);
+	}
+
+	const [selectedBeats, setSelectedBeats] = useState([]);
+
+	function handleBeatClick(event, keyRowClicked, midiNote) {
+		if (penModeActivated) {
+			console.log("beat clicked");
+			removeNote(keyRowClicked, midiNote.startBeat);
+			setKeyRowClicked(keyRowClicked);
+			setErasing(true);
+		} else {
+			// selectBeat()
+			// setSelectedBeats((prevSelection) => {
+			// 	const newSelection = [...prevSelection];
+			// 	newSelection.push(midiNote);
+			// 	console.log(newSelection);
+			// 	return newSelection;
+			// });
+		}
 	}
 
 	return (
 		<div
 			onMouseMove={handleMouseMove}
-			// onMouseDown={handleMouseDown}
 			onMouseUp={handleMouseUp}
 			onMouseLeave={handleMouseUp}
 			style={{ display: "flex", flexDirection: "column-reverse" }}
@@ -78,6 +102,9 @@ function KeyRows({
 						numBeats={TOTAL_BEATS}
 						handleMouseDown={(event, columnIndex) =>
 							handleMouseDown(event, keyRowIndex, columnIndex)
+						}
+						handleBeatClick={(event, midiNote) =>
+							handleBeatClick(event, keyRowIndex, midiNote)
 						}
 						key={keyRowIndex}
 						keyNumber={keyRowIndex}

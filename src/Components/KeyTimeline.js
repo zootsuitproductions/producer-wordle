@@ -10,6 +10,7 @@ function KeyTimeline({
 	rowHeight,
 	midiNotes,
 	handleMouseDown,
+	handleBeatClick,
 	addNoteAndClearSpaceAsNecessary,
 	penModeActivated = false,
 	timeDivision = 16,
@@ -45,13 +46,6 @@ function KeyTimeline({
 		}
 	}
 
-	// function handleMouseDown(index) {
-	// 	if (penModeActivated) {
-	// 		penInNote(index);
-	// 	}
-	// 	console.log(index);
-	// }
-
 	return (
 		<div
 			style={{
@@ -60,8 +54,6 @@ function KeyTimeline({
 				flexDirection: "row",
 				borderLeft: "1px solid white",
 			}}
-			// onMouseDown={handleMouseDown}
-			// onMouseUp={handleMouseUp}
 		>
 			{Array.from({ length: timeDivision }).map((_, index) => (
 				//Represents an individual beat on the key timeline
@@ -80,6 +72,7 @@ function KeyTimeline({
 					correct={midiNote.correct}
 					width={width}
 					rowHeight={rowHeight}
+					handleMouseDown={(event) => handleBeatClick(event, midiNote)}
 					removeBeat={() => removeNote(keyNumber, midiNote.startBeat)}
 					penModeActivated={penModeActivated}
 					numBars={timeDivision}

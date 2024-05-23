@@ -62,6 +62,12 @@ const useMidi = (keys) => {
 		});
 	}
 
+	//todo
+	function removeNotesBetween(keyIndex, startTime, endTime) {}
+
+	//lets do some deisgn work. stop cowboy coding
+	function selectBeatsBetween(startKey, endKey, startTime, endTime) {}
+
 	function removeNote(keyIndex, startTime) {
 		const newKeyNotes = [...keytracksData[keyIndex]];
 
@@ -95,14 +101,17 @@ const useMidi = (keys) => {
 
 				const correctedKeytrack = userKeytrack.map((noteEvent) => {
 					let isCorrect = false;
+					let endBeat = noteEvent.endBeat;
 					for (let correctNoteEvent of correctKeytrack) {
 						if (noteEvent.startBeat === correctNoteEvent.startBeat) {
 							isCorrect = true;
+							endBeat = correctNoteEvent.endBeat;
 							break;
 						}
 					}
 					return new MidiNoteEvent({
 						...noteEvent,
+						endBeat: endBeat,
 						correct: isCorrect,
 					});
 				});

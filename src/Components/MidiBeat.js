@@ -7,6 +7,7 @@ function MidiBeat({
 	startTime,
 	endTime,
 	penModeActivated = true,
+	handleMouseDown,
 	width,
 	rowHeight,
 	correct,
@@ -16,19 +17,11 @@ function MidiBeat({
 		removeBeat();
 	};
 
-	const handleClick = () => {
-		if (penModeActivated) {
-			handleDoubleClick(startTime);
-		}
-	};
-
-	// need to account for doubling beat divisions. keep track of beat state not by index but by map and default
-
 	return (
 		<div
 			key={startTime}
 			onDoubleClick={() => handleDoubleClick()}
-			onMouseDown={() => handleClick()}
+			onMouseDown={handleMouseDown}
 			style={{
 				position: "absolute",
 				left: (startTime / numBeats) * width + "px",

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import React from "react";
 import "../CSS/KeyTimeline.css";
-import { getDisplayTime, isBlackKey } from "../Services/utils";
+import { isBlackKey } from "../Services/utils";
 import MidiBeat from "./MidiBeat";
 
 function KeyTimeline({
@@ -9,6 +9,7 @@ function KeyTimeline({
 	width,
 	rowHeight,
 	midiNotes,
+	handleMouseDown,
 	addNoteAndClearSpaceAsNecessary,
 	penModeActivated = false,
 	timeDivision = 16,
@@ -22,13 +23,7 @@ function KeyTimeline({
 
 	useEffect(() => {
 		setBlackKey(isBlackKey(keyNumber));
-	}, []);
-
-	const handleClick = (index) => {
-		if (penModeActivated) {
-			penInNote(index);
-		}
-	};
+	}, [keyNumber]);
 
 	function penInNote(index) {
 		const startOfBeat = (numBeats * index) / timeDivision;
@@ -50,6 +45,13 @@ function KeyTimeline({
 		}
 	}
 
+	// function handleMouseDown(index) {
+	// 	if (penModeActivated) {
+	// 		penInNote(index);
+	// 	}
+	// 	console.log(index);
+	// }
+
 	return (
 		<div
 			style={{
@@ -58,13 +60,15 @@ function KeyTimeline({
 				flexDirection: "row",
 				borderLeft: "1px solid white",
 			}}
+			// onMouseDown={handleMouseDown}
+			// onMouseUp={handleMouseUp}
 		>
 			{Array.from({ length: timeDivision }).map((_, index) => (
+				//Represents an individual beat on the key timeline
 				<div
 					key={index}
 					onDoubleClick={() => penInNote(index)}
-					b
-					onClick={() => handleClick(index)}
+					onMouseDown={(event) => handleMouseDown(event, index)}
 					className={`Beat ${getBeatClass(index, blackKey)}`}
 				></div>
 			))}

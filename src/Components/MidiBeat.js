@@ -28,7 +28,7 @@ function MidiBeat({
 		<div
 			key={startTime}
 			onDoubleClick={() => handleDoubleClick()}
-			onClick={() => handleClick()}
+			onMouseDown={() => handleClick()}
 			style={{
 				position: "absolute",
 				left: (startTime / numBeats) * width + "px",

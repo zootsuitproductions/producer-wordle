@@ -31,24 +31,33 @@ const useMidi = (keys) => {
 	}, [keytracksData]);
 
 	// todo make timing object oriented and clear.
-	function addNoteAndClearSpaceAsNecessary(keyIndex, startOfBeat, endOfBeat) {
-		const newKeyNotes = [...keytracksData[keyIndex]];
-		newKeyNotes.filter((midiNote) => {
-			const startBeat = midiNote.startBeat;
-			return !(startBeat >= startOfBeat && startBeat < endOfBeat);
+	function addNoteAndClearSpaceAsNecessary(
+		keyIndex,
+		newNoteStartBeat,
+		newNoteEndBeat
+	) {
+		const newKeytrack = [...keytracksData[keyIndex]].filter((existingNote) => {
+			const exisitingBeatStart = existingNote.startBeat;
+
+			// do not include existing beats that start during the new beat
+			return !(
+				exisitingBeatStart >= newNoteStartBeat &&
+				exisitingBeatStart < newNoteEndBeat
+			);
 		});
 
-		newKeyNotes.push(
+		newKeytrack.push(
 			new MidiNoteEvent({
 				note: keyIndex, // MIDI note number (e.g., 60 for Middle C)
-				startBeat: startOfBeat, // Start beat of the note
-				endBeat: endOfBeat, // End beat of the note
+				startBeat: newNoteStartBeat, // Start beat of the note
+				endBeat: newNoteEndBeat, // End beat of the note
 			})
 		);
 
 		setMidiData((prevMidiData) => {
 			const newMidiData = [...prevMidiData]; // Create a shallow copy
-			newMidiData[keyIndex] = newKeyNotes; // Update the copy with new notes
+			newMidiData[keyIndex] = newKeytrack; // Update the copy with new notes
+
 			return newMidiData; // Return the updated state
 		});
 	}

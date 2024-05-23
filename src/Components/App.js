@@ -7,14 +7,7 @@ import CorrectAudioPlayer from "./CorrectAudioPlayer";
 
 function App() {
 	//todo this is bad
-	const [sampleFiles, setSampleFiles] = useState([
-		"/cc kick.wav",
-		"/end of the road boyz samples/eotrb Snare.wav",
-		"/end of the road boyz samples/eotrb Snare.wav",
-		"/end of the road boyz samples/eotrb Snare.wav",
-		"/end of the road boyz samples/eotrb Snare.wav",
-		"/end of the road boyz samples/eotrb Snare.wav",
-	]);
+	const [sampleFiles, setSampleFiles] = useState(null);
 	//on itialization, load all samples into an array from a folder in public called end of the road boys samples
 	useEffect(() => {
 		const loadSamples = async () => {
@@ -28,10 +21,9 @@ function App() {
 				"Low Hat.wav",
 				"Snare Hi.wav",
 				"Snare.wav",
-				// Add more sample file names here
 			];
 			const samples = sampleNames.map((name) => {
-				return `end of the road boyz samples/eotrb ${name}`;
+				return `end of the road boyz samples/${name}`;
 			});
 			setSampleFiles(samples);
 		};
@@ -44,9 +36,7 @@ function App() {
 			<CorrectAudioPlayer
 				correctAudioFile={"end of the road boys no drums.wav"}
 			/>
-			{/* <PlaybackTimelineTest /> */}
-			{/* ["kick", "clap", 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] */}
-			<PianoRoll keys={sampleFiles} />
+			{sampleFiles && <PianoRoll keys={sampleFiles} />}
 		</div>
 	);
 }

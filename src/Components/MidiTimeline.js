@@ -6,7 +6,7 @@ import TopOfTimeline from "./TopOfTimeline";
 import Playhead from "./Playhead";
 import useAudioMidiPlayer from "../Hooks/useAudioMidiPlayer";
 import useMidi from "../Hooks/useMidi";
-import useMidiEditorControls from "../Hooks/useMidiEditorControls";
+import useMidiEditorKeyControls from "../Hooks/useMidiEditorKeyControls";
 import KeyRows from "./KeyRows";
 
 function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
@@ -14,7 +14,6 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 	const MIN_RIGHT = MAX_LEFT + minWidth;
 	const [pianoWidth, setPianoWidth] = useState(minWidth);
 	const [leftPosition, setLeftPosition] = useState(MAX_LEFT);
-	// const [playheadPosition, setPlayheadPosition] = useState(0);
 
 	const {
 		midiDataByNote,
@@ -36,7 +35,7 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 		// setPlayheadPosition
 	);
 
-	const { timeDivision, penModeActivated } = useMidiEditorControls(
+	const { timeDivision, penModeActivated } = useMidiEditorKeyControls(
 		togglePlay,
 		checkForCorrectness,
 		saveToLocalStorage
@@ -87,7 +86,6 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 					return newPos;
 				}
 			});
-			// console.log(e.deltaX);
 		};
 
 		document.addEventListener("wheel", handleZoom, { passive: false });

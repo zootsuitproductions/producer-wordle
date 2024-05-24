@@ -11,10 +11,6 @@ function App() {
 	//on itialization, load all samples into an array from a folder in public called end of the road boys samples
 	useEffect(() => {
 		const loadSamples = async () => {
-			// As i add more samples it become a lot more laggy. test if it is the interface or the audio
-			//
-			// todo:::^^^
-
 			const sampleNames = [
 				"Hi Hat.wav",
 				"Kick.wav",

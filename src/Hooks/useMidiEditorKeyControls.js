@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import MidiNoteEvent from "../Models/MidiNoteEvent";
 
-export default function useMidiEditorControls(
+export default function useMidiEditorKeyControls(
 	togglePlay,
 	checkForCorrectness,
 	saveToLocalStorage

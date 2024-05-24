@@ -123,6 +123,7 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 				keyHeight={keyHeight}
 				pianoWidth={pianoWidth}
 				penModeActivated={penModeActivated}
+				leftPosition={leftPosition}
 			/>
 		</div>
 	);

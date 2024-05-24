@@ -12,6 +12,7 @@ export default function useMidiPen({
 	const [erasing, setErasing] = useState(false);
 	const [currentlyHoveredIndex, setCurrentlyHoveredIndex] = useState(null);
 	const [keyRowClicked, setKeyRowClicked] = useState(0);
+	// const containerRef = useRef(null);
 
 	function penInNote(keyNumber, index) {
 		const startOfBeat = (TOTAL_BEATS * index) / timeDivision;
@@ -32,13 +33,6 @@ export default function useMidiPen({
 		setKeyRowClicked(keyRowClicked);
 		setCurrentlyHoveredIndex(index);
 		setPenDragging(true);
-	}
-
-	function getBeatIndexOfMouse(event) {
-		const rect = event.currentTarget.getBoundingClientRect();
-		const x = event.clientX - rect.left;
-		const beatWidth = rect.width / timeDivision;
-		return Math.floor(x / beatWidth);
 	}
 
 	function handlePenDrag(event) {

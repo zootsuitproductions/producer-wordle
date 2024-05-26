@@ -1,5 +1,5 @@
 //user on mouse move in the midi timeline. calculate x position.
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import useMidiPen from "./useMidiPen";
 import useMultiNoteSelection from "./useMultiNoteSelection";
 
@@ -11,6 +11,7 @@ export default function useMidiEditorMouseFeatures({
 	TOTAL_BEATS,
 	pianoWidth,
 	leftPosition,
+	notes,
 }) {
 	useEffect(() => {
 		document.addEventListener("mousemove", handleMouseMove);
@@ -39,6 +40,7 @@ export default function useMidiEditorMouseFeatures({
 		handleSelectionMouseDown,
 		handleSelectionUp,
 	} = useMultiNoteSelection({
+		notes,
 		pianoWidth,
 		leftPosition,
 	});

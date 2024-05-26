@@ -43,9 +43,10 @@ function KeyRows({
 				style={{
 					display: "flex",
 					flexDirection: "column-reverse",
-					// position: "relative",
+					position: "relative",
 				}}
 			>
+				{/* selection bounding box */}
 				<div style={getSelectionBoxStyle()}></div>
 				{sampleFiles.map((_, keyRowIndex) => {
 					return (

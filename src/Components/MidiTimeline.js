@@ -24,6 +24,8 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 		removeNote,
 	} = useMidi(sampleFiles);
 
+	// const { } = useSelectNotes
+
 	const [bpm, setBpm] = useState(101);
 	const TOTAL_BEATS = 16;
 
@@ -32,7 +34,6 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 		midiDataSorted,
 		bpm,
 		TOTAL_BEATS
-		// setPlayheadPosition
 	);
 
 	const { timeDivision, penModeActivated } = useMidiEditorKeyControls(
@@ -44,7 +45,7 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 	useEffect(() => {
 		const handleZoom = (e) => {
 			if (e.altKey || e.ctrlKey) {
-				var scaleFactor = e.ctrlKey ? -12 : -5; //mouse vs trackpad sensitivity
+				var scaleFactor = e.ctrlKey ? -50 : -5; //mouse vs trackpad sensitivity
 				e.preventDefault();
 
 				//0: calculate the mouse position - to box left
@@ -71,21 +72,20 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 
 				setPianoWidth(newPianoWidth);
 				setLeftPosition(newLeftPosition);
-			}
-			if (e.deltaX !== 0) {
+			} else if (e.deltaX !== 0) {
 				e.preventDefault();
+				setLeftPosition((prevLeft) => {
+					const newPos = prevLeft - e.deltaX;
+					// return newPos;
+					if (newPos > MAX_LEFT) {
+						return MAX_LEFT;
+					} else if (newPos + pianoWidth < MIN_RIGHT) {
+						return MIN_RIGHT - pianoWidth;
+					} else {
+						return newPos;
+					}
+				});
 			}
-			setLeftPosition((prevLeft) => {
-				const newPos = prevLeft - e.deltaX;
-				// return newPos;
-				if (newPos > MAX_LEFT) {
-					return MAX_LEFT;
-				} else if (newPos + pianoWidth < MIN_RIGHT) {
-					return MIN_RIGHT - pianoWidth;
-				} else {
-					return newPos;
-				}
-			});
 		};
 
 		document.addEventListener("wheel", handleZoom, { passive: false });
@@ -107,7 +107,6 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 	return (
 		<div style={containerStyle}>
 			<Playhead
-				// positionFraction={playheadPosition}
 				timelineWidth={pianoWidth}
 				getCurrentPosition={() => getCurrentBeat() / TOTAL_BEATS}
 				isPlaying={isPlaying}
@@ -124,6 +123,8 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 				pianoWidth={pianoWidth}
 				penModeActivated={penModeActivated}
 				leftPosition={leftPosition}
+
+				// onPenDrag
 			/>
 		</div>
 	);

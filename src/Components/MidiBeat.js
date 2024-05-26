@@ -19,6 +19,7 @@ function MidiBeat({
 
 	return (
 		<div
+			className={"note"}
 			key={startTime}
 			onDoubleClick={() => handleDoubleClick()}
 			onMouseDown={handleMouseDown}

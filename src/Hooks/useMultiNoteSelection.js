@@ -2,11 +2,15 @@
 import { useState, useRef } from "react";
 
 export default function useMultiNoteSelection({
+	selectNotesBetweenRowsAndTimes,
+	addNoteAndClearSpaceAsNecessary,
 	pianoWidth,
 	leftPosition,
 	notes,
+	keyHeight,
 }) {
 	const [isDragging, setIsDragging] = useState(false);
+	const [noteElements, setNoteElements] = useState([]);
 	const [startPoint, setStartPoint] = useState({ x: 0, y: 0 });
 	const [endPoint, setEndPoint] = useState({ x: 0, y: 0 });
 	const containerRef = useRef(null);
@@ -17,6 +21,8 @@ export default function useMultiNoteSelection({
 			setIsDragging(true);
 			setStartPoint({ x: e.clientX - left, y: e.clientY - top });
 			setEndPoint({ x: e.clientX - left, y: e.clientY - top });
+
+			setNoteElements(document.querySelectorAll(`.${"note"}`));
 		}
 	};
 
@@ -41,7 +47,7 @@ export default function useMultiNoteSelection({
 			const x2 = Math.max(startPoint.x, endPoint.x);
 			const y2 = Math.min(
 				Math.max(startPoint.y, endPoint.y),
-				containerRef.current.offsetHeight
+				containerRef.current.offsetHeight - 1
 			);
 
 			return {
@@ -51,6 +57,7 @@ export default function useMultiNoteSelection({
 				top: y1,
 				width: x2 - x1,
 				height: y2 - y1,
+				zIndex: "4",
 			};
 		} else {
 			return {};
@@ -63,42 +70,36 @@ export default function useMultiNoteSelection({
 		const x2 = Math.max(startPoint.x, endPoint.x);
 		const y2 = Math.min(
 			Math.max(startPoint.y, endPoint.y),
-			containerRef.current.offsetHeight
+			containerRef.current.offsetHeight - 1
 		);
 
-		//i could calculate the beat start and end instead, write a function to select between on
-		// the midi data, instead of using dom shit
+		const beatTimeLeft = 16 * (x1 / pianoWidth);
+		const beatTimeRight = 16 * (x2 / pianoWidth);
 
-		// also, i should seperate these hooks for now make everything less headachey
+		const bottomKey = Math.floor(
+			(containerRef.current.offsetHeight - y2) / keyHeight
+		);
+		const topKey = Math.floor(
+			(containerRef.current.offsetHeight - y1) / keyHeight
+		);
 
-		const noteElements = document.querySelectorAll(`.${"note"}`);
-		console.log(noteElements.length);
-		const selected = Array.from(noteElements).filter((note) => {
-			const noteRelativeRect = note.getBoundingClientRect();
-			// const noteRelativeRect = {
-			// 	top: noteRect.top - parentTop,
-			// 	right: noteRect.right - parentLeft,
-			// 	bottom: noteRect.bottom - parentTop,
-			// 	left: noteRect.left - parentLeft,
-			// };
+		selectNotesBetweenRowsAndTimes(
+			bottomKey,
+			topKey,
+			beatTimeLeft,
+			beatTimeRight
+		);
 
-			return !(
-				noteRelativeRect.right < x1 ||
-				noteRelativeRect.left > x2 ||
-				noteRelativeRect.bottom < y1 ||
-				noteRelativeRect.top > y2
-			);
-		});
+		// addNoteAndClearSpaceAsNecessary(0, beatTimeLeft, beatTimeLeft + 1);
 
-		console.log(selectNotes.length);
-
-		// setSelectedNotes(selected);
+		// GET THE SELECTION BOX BY JQUERY TO GET ABSOLUTE POSITION
 	};
 
 	return {
 		containerRef,
 		startPoint,
 		endPoint,
+		isDragging,
 		getSelectionBoxStyle,
 		handleSelectionMouseMove,
 		handleSelectionMouseDown,

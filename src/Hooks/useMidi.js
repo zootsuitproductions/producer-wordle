@@ -66,7 +66,22 @@ const useMidi = (keys) => {
 	function removeNotesBetween(keyIndex, startTime, endTime) {}
 
 	//lets do some deisgn work. stop cowboy coding
-	function selectBeatsBetween(startKey, endKey, startTime, endTime) {}
+	function selectNotesBetweenRowsAndTimes(minKey, maxKey, startBeat, endBeat) {
+		setMidiData((prevState) => {
+			const newMidiData = [...prevState];
+			for (let i = minKey; i <= maxKey; i++) {
+				const keytrack = newMidiData[i];
+				if (keytrack) {
+					keytrack.forEach((note) => {
+						if (note.endBeat >= startBeat && note.startBeat <= endBeat) {
+							note.correct = false;
+						}
+					});
+				}
+			}
+			return newMidiData;
+		});
+	}
 
 	function removeNote(keyIndex, startTime) {
 		const newKeyNotes = [...keytracksData[keyIndex]];
@@ -122,6 +137,7 @@ const useMidi = (keys) => {
 	}
 
 	return {
+		selectNotesBetweenRowsAndTimes,
 		midiDataByNote: keytracksData,
 		addNoteAndClearSpaceAsNecessary,
 		removeNote,

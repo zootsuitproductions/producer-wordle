@@ -12,7 +12,7 @@ function KeyRows({
 	keyHeight,
 	leftPosition,
 	pianoWidth,
-
+	selectNotesBetweenRowsAndTimes,
 	penModeActivated,
 }) {
 	const {
@@ -20,10 +20,10 @@ function KeyRows({
 		getSelectionBoxStyle,
 		handleNoteClick,
 		handleEmptyTimelineClick,
-		handleMouseMove,
 		handleMouseLeave,
-		handleMouseUp,
 	} = useMidiEditorMouseFeatures({
+		selectNotesBetweenRowsAndTimes,
+		keyHeight,
 		penModeActivated,
 		addNoteAndClearSpaceAsNecessary,
 		removeNote,
@@ -47,7 +47,7 @@ function KeyRows({
 				}}
 			>
 				{/* selection bounding box */}
-				<div style={getSelectionBoxStyle()}></div>
+				<div className="selection-box" style={getSelectionBoxStyle()}></div>
 				{sampleFiles.map((_, keyRowIndex) => {
 					return (
 						<KeyTimeline

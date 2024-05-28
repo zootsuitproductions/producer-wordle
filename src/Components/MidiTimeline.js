@@ -22,6 +22,7 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 		checkForCorrectness,
 		saveToLocalStorage,
 		removeNote,
+		selectNotesBetweenRowsAndTimes,
 	} = useMidi(sampleFiles);
 
 	// const { } = useSelectNotes
@@ -76,7 +77,6 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 				e.preventDefault();
 				setLeftPosition((prevLeft) => {
 					const newPos = prevLeft - e.deltaX;
-					// return newPos;
 					if (newPos > MAX_LEFT) {
 						return MAX_LEFT;
 					} else if (newPos + pianoWidth < MIN_RIGHT) {
@@ -123,6 +123,7 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 				pianoWidth={pianoWidth}
 				penModeActivated={penModeActivated}
 				leftPosition={leftPosition}
+				selectNotesBetweenRowsAndTimes={selectNotesBetweenRowsAndTimes}
 
 				// onPenDrag
 			/>

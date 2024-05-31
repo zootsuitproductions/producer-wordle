@@ -26,9 +26,14 @@ export default function useAudioMidiPlayer(
 	useEffect(() => {
 		const prevMidiData = prevMidiDataRef.current;
 
-		const newMidiData = midiDataSorted.filter(
-			(event) => !prevMidiData.some((prevEvent) => prevEvent.id === event.id)
-		);
+		console.log("changed");
+		console.log("prev" + prevMidiData.map((e) => e.id));
+		console.log("sorted" + midiDataSorted.map((e) => e.id));
+
+		const newMidiData = midiDataSorted.filter((event) => {
+			return !prevMidiData.some((prevEvent) => prevEvent.id === event.id);
+		});
+
 		const removedMidiData = prevMidiData.filter(
 			(event) =>
 				!midiDataSorted.some((currentEvent) => currentEvent.id === event.id)
@@ -48,6 +53,7 @@ export default function useAudioMidiPlayer(
 		});
 
 		// Update the previous midiDataSorted reference
+		//make
 		prevMidiDataRef.current = midiDataSorted;
 	}, [midiDataSorted]);
 

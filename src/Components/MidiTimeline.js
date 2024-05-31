@@ -24,6 +24,7 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 		removeNote,
 		selectNotesBetweenRowsAndTimes,
 		moveSelectedNotes,
+		commitSelectionMovement,
 	} = useMidi(sampleFiles);
 
 	const [bpm, setBpm] = useState(101);
@@ -123,7 +124,7 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 				penModeActivated={penModeActivated}
 				selectNotesBetweenRowsAndTimes={selectNotesBetweenRowsAndTimes}
 				moveSelectedNotes={moveSelectedNotes}
-
+				commitSelectionMovement={commitSelectionMovement}
 				// onPenDrag
 			/>
 		</div>

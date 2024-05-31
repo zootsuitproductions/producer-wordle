@@ -67,6 +67,26 @@ const useMidi = (keys) => {
 
 	const selectedNoteStartPositions = useRef({});
 
+	function commitSelectionMovement() {
+		console.log("commit");
+		selectedNoteStartPositions.current = {};
+		setMidiData((prevState) => {
+			const newMidiData = [...prevState];
+			for (let i = 0; i < newMidiData.length; i++) {
+				const keytrack = newMidiData[i];
+				if (keytrack) {
+					keytrack.forEach((note, index) => {
+						if (note.selected) {
+							keytrack[index] = MidiNoteEvent.clone(note);
+						}
+					});
+				}
+			}
+			return newMidiData;
+		});
+	}
+
+	// the moved notes
 	function moveSelectedNotes(beatOffset) {
 		setMidiData((prevState) => {
 			const newMidiData = [...prevState];
@@ -177,6 +197,7 @@ const useMidi = (keys) => {
 		saveToLocalStorage,
 		midiDataSorted,
 		moveSelectedNotes,
+		commitSelectionMovement,
 	};
 };
 

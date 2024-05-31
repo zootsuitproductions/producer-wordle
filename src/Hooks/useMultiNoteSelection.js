@@ -6,6 +6,7 @@ export default function useMultiNoteSelection({
 	pianoWidth,
 	keyHeight,
 	moveSelectedNotes,
+	commitSelectionMovement,
 }) {
 	const [isSelecting, setIsSelecting] = useState(false);
 	const [isDragging, setIsDragging] = useState(false);
@@ -31,11 +32,13 @@ export default function useMultiNoteSelection({
 	}
 
 	function handleSelectionDragMove(e) {
-		const { left, top } = containerRef.current.getBoundingClientRect();
-		const currentPoint = { x: e.clientX - left, y: e.clientY - top };
+		if (isDragging) {
+			const { left, top } = containerRef.current.getBoundingClientRect();
+			const currentPoint = { x: e.clientX - left, y: e.clientY - top };
 
-		const beatOffset = (16 * (currentPoint.x - startPoint.x)) / pianoWidth;
-		moveSelectedNotes(beatOffset);
+			const beatOffset = (16 * (currentPoint.x - startPoint.x)) / pianoWidth;
+			moveSelectedNotes(beatOffset);
+		}
 	}
 
 	function handleSelectionMouseMove(e) {
@@ -51,6 +54,11 @@ export default function useMultiNoteSelection({
 
 	function handleSelectionUp() {
 		setIsSelecting(false);
+
+		if (isDragging) {
+			commitSelectionMovement();
+			setIsDragging(false);
+		}
 	}
 
 	const getSelectionBoxStyle = () => {

@@ -14,6 +14,7 @@ function KeyRows({
 	selectNotesBetweenRowsAndTimes,
 	penModeActivated,
 	moveSelectedNotes,
+	commitSelectionMovement,
 }) {
 	const {
 		containerRef,
@@ -22,6 +23,7 @@ function KeyRows({
 		handleEmptyTimelineClick,
 		handleMouseLeave,
 	} = useMidiEditorMouseFeatures({
+		commitSelectionMovement,
 		moveSelectedNotes,
 		selectNotesBetweenRowsAndTimes,
 		keyHeight,

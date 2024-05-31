@@ -13,6 +13,7 @@ export default function useMidiEditorMouseFeatures({
 	keyHeight,
 	selectNotesBetweenRowsAndTimes,
 	moveSelectedNotes,
+	commitSelectionMovement,
 }) {
 	useEffect(() => {
 		document.addEventListener("mousemove", handleMouseMove);
@@ -40,6 +41,7 @@ export default function useMidiEditorMouseFeatures({
 		handleSelectionUp,
 		handleSelectionDragStart,
 	} = useMultiNoteSelection({
+		commitSelectionMovement,
 		moveSelectedNotes,
 		selectNotesBetweenRowsAndTimes,
 		pianoWidth,
@@ -47,6 +49,7 @@ export default function useMidiEditorMouseFeatures({
 	});
 
 	function handleNoteMouseDown(event, keyRowClicked, midiNote) {
+		// console.log(penModeActivated);
 		if (penModeActivated) {
 			penRemoveBeat(keyRowClicked, midiNote);
 		} else {

@@ -23,9 +23,8 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 		saveToLocalStorage,
 		removeNote,
 		selectNotesBetweenRowsAndTimes,
+		moveSelectedNotes,
 	} = useMidi(sampleFiles);
-
-	// const { } = useSelectNotes
 
 	const [bpm, setBpm] = useState(101);
 	const TOTAL_BEATS = 16;
@@ -122,8 +121,8 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 				keyHeight={keyHeight}
 				pianoWidth={pianoWidth}
 				penModeActivated={penModeActivated}
-				leftPosition={leftPosition}
 				selectNotesBetweenRowsAndTimes={selectNotesBetweenRowsAndTimes}
+				moveSelectedNotes={moveSelectedNotes}
 
 				// onPenDrag
 			/>

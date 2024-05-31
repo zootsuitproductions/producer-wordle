@@ -3,14 +3,12 @@ import { useState, useRef } from "react";
 
 export default function useMultiNoteSelection({
 	selectNotesBetweenRowsAndTimes,
-	addNoteAndClearSpaceAsNecessary,
 	pianoWidth,
-	leftPosition,
-	notes,
 	keyHeight,
+	moveSelectedNotes,
 }) {
+	const [isSelecting, setIsSelecting] = useState(false);
 	const [isDragging, setIsDragging] = useState(false);
-	const [noteElements, setNoteElements] = useState([]);
 	const [startPoint, setStartPoint] = useState({ x: 0, y: 0 });
 	const [endPoint, setEndPoint] = useState({ x: 0, y: 0 });
 	const containerRef = useRef(null);
@@ -18,29 +16,45 @@ export default function useMultiNoteSelection({
 	const handleSelectionMouseDown = (e) => {
 		if (containerRef.current) {
 			const { left, top } = containerRef.current.getBoundingClientRect();
-			setIsDragging(true);
+			setIsSelecting(true);
 			setStartPoint({ x: e.clientX - left, y: e.clientY - top });
 			setEndPoint({ x: e.clientX - left, y: e.clientY - top });
-
-			setNoteElements(document.querySelectorAll(`.${"note"}`));
+			selectNotes();
 		}
 	};
 
+	function handleSelectionDragStart(e) {
+		const { left, top } = containerRef.current.getBoundingClientRect();
+		setStartPoint({ x: e.clientX - left, y: e.clientY - top });
+		setEndPoint({ x: e.clientX - left, y: e.clientY - top });
+		setIsDragging(true);
+	}
+
+	function handleSelectionDragMove(e) {
+		const { left, top } = containerRef.current.getBoundingClientRect();
+		const currentPoint = { x: e.clientX - left, y: e.clientY - top };
+
+		const beatOffset = (16 * (currentPoint.x - startPoint.x)) / pianoWidth;
+		moveSelectedNotes(beatOffset);
+	}
+
 	function handleSelectionMouseMove(e) {
 		// find debugger pop up class like on sigma.io
-		if (isDragging && containerRef.current) {
+		if (isSelecting && containerRef.current) {
 			const { left, top } = containerRef.current.getBoundingClientRect();
 			setEndPoint({ x: e.clientX - left, y: e.clientY - top });
 			selectNotes();
+		} else if (isDragging) {
+			handleSelectionDragMove(e);
 		}
 	}
 
 	function handleSelectionUp() {
-		setIsDragging(false);
+		setIsSelecting(false);
 	}
 
 	const getSelectionBoxStyle = () => {
-		if (isDragging) {
+		if (isSelecting) {
 			// console.log();
 			const x1 = Math.max(Math.min(startPoint.x, endPoint.x), 0);
 			const y1 = Math.max(Math.min(startPoint.y, endPoint.y), 0);
@@ -89,20 +103,14 @@ export default function useMultiNoteSelection({
 			beatTimeLeft,
 			beatTimeRight
 		);
-
-		// addNoteAndClearSpaceAsNecessary(0, beatTimeLeft, beatTimeLeft + 1);
-
-		// GET THE SELECTION BOX BY JQUERY TO GET ABSOLUTE POSITION
 	};
 
 	return {
 		containerRef,
-		startPoint,
-		endPoint,
-		isDragging,
 		getSelectionBoxStyle,
 		handleSelectionMouseMove,
 		handleSelectionMouseDown,
 		handleSelectionUp,
+		handleSelectionDragStart,
 	};
 }

@@ -10,18 +10,19 @@ function KeyRows({
 	addNoteAndClearSpaceAsNecessary,
 	removeNote,
 	keyHeight,
-	leftPosition,
 	pianoWidth,
 	selectNotesBetweenRowsAndTimes,
 	penModeActivated,
+	moveSelectedNotes,
 }) {
 	const {
 		containerRef,
 		getSelectionBoxStyle,
-		handleNoteClick,
+		handleNoteMouseDown,
 		handleEmptyTimelineClick,
 		handleMouseLeave,
 	} = useMidiEditorMouseFeatures({
+		moveSelectedNotes,
 		selectNotesBetweenRowsAndTimes,
 		keyHeight,
 		penModeActivated,
@@ -30,10 +31,7 @@ function KeyRows({
 		timeDivision,
 		TOTAL_BEATS,
 		pianoWidth,
-		leftPosition,
 	});
-
-	const [selectedBeats, setSelectedBeats] = useState([]);
 
 	return (
 		<div>
@@ -53,11 +51,13 @@ function KeyRows({
 						<KeyTimeline
 							timeDivision={timeDivision}
 							numBeats={TOTAL_BEATS}
-							handleMouseDown={(event, columnIndex) =>
-								handleEmptyTimelineClick(event, keyRowIndex, columnIndex)
+							handleMouseDown={
+								(event, columnIndex) =>
+									handleEmptyTimelineClick(event, keyRowIndex, columnIndex)
+								// i can call 2 functions in here
 							}
-							handleBeatClick={(event, midiNote) =>
-								handleNoteClick(event, keyRowIndex, midiNote)
+							handleNoteMouseDown={(event, midiNote) =>
+								handleNoteMouseDown(event, keyRowIndex, midiNote)
 							}
 							key={keyRowIndex}
 							keyNumber={keyRowIndex}

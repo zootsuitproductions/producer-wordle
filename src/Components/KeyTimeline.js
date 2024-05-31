@@ -10,7 +10,7 @@ function KeyTimeline({
 	rowHeight,
 	midiNotes,
 	handleMouseDown,
-	handleBeatClick,
+	handleNoteMouseDown,
 	addNoteAndClearSpaceAsNecessary,
 	penModeActivated = false,
 	timeDivision = 16,
@@ -67,12 +67,13 @@ function KeyTimeline({
 
 			{midiNotes.map((midiNote) => (
 				<MidiBeat
+					selected={midiNote.selected}
 					startTime={midiNote.startBeat}
 					endTime={midiNote.endBeat}
 					correct={midiNote.correct}
 					width={width}
 					rowHeight={rowHeight}
-					handleMouseDown={(event) => handleBeatClick(event, midiNote)}
+					handleMouseDown={(event) => handleNoteMouseDown(event, midiNote)}
 					removeBeat={() => removeNote(keyNumber, midiNote.startBeat)}
 					penModeActivated={penModeActivated}
 					numBars={timeDivision}

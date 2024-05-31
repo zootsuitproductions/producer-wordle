@@ -8,6 +8,7 @@ class MidiNoteEvent {
 		this.velocity = velocity; // Velocity of the note (default: 0.9)
 		this.correct = correct; // Boolean indicating if the note is correct (default: true)
 		this.id = MidiNoteEvent.getNextId(); // Generate a unique identifier
+		this.selected = false;
 	}
 
 	static getNextId() {

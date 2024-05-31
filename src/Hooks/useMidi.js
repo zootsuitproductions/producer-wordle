@@ -1,5 +1,5 @@
 // useMidi.js
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import MidiNoteEvent from "../Models/MidiNoteEvent";
 
 const useMidi = (keys) => {
@@ -65,16 +65,48 @@ const useMidi = (keys) => {
 	//todo
 	function removeNotesBetween(keyIndex, startTime, endTime) {}
 
+	const selectedNoteStartPositions = useRef({});
+
+	function moveSelectedNotes(beatOffset) {
+		setMidiData((prevState) => {
+			const newMidiData = [...prevState];
+			for (let i = 0; i < newMidiData.length; i++) {
+				const keytrack = newMidiData[i];
+				if (keytrack) {
+					keytrack.forEach((note) => {
+						if (note.selected) {
+							note.startBeat =
+								selectedNoteStartPositions.current[note.id].startBeat +
+								beatOffset;
+							note.endBeat =
+								selectedNoteStartPositions.current[note.id].endBeat +
+								beatOffset;
+						}
+					});
+				}
+			}
+			return newMidiData;
+		});
+	}
+
 	//lets do some deisgn work. stop cowboy coding
 	function selectNotesBetweenRowsAndTimes(minKey, maxKey, startBeat, endBeat) {
 		setMidiData((prevState) => {
 			const newMidiData = [...prevState];
-			for (let i = minKey; i <= maxKey; i++) {
+			for (let i = 0; i < newMidiData.length; i++) {
 				const keytrack = newMidiData[i];
-				if (keytrack) {
+				if (i < minKey || i > maxKey) {
+					keytrack.forEach((note) => (note.selected = false));
+				} else if (keytrack) {
 					keytrack.forEach((note) => {
-						if (note.endBeat >= startBeat && note.startBeat <= endBeat) {
-							note.correct = false;
+						note.selected =
+							note.endBeat >= startBeat && note.startBeat <= endBeat;
+
+						if (note.selected) {
+							selectedNoteStartPositions.current[note.id] = {
+								startBeat: note.startBeat,
+								endBeat: note.endBeat,
+							};
 						}
 					});
 				}
@@ -144,6 +176,7 @@ const useMidi = (keys) => {
 		checkForCorrectness,
 		saveToLocalStorage,
 		midiDataSorted,
+		moveSelectedNotes,
 	};
 };
 

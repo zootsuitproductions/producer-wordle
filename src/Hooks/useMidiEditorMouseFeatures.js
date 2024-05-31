@@ -10,10 +10,9 @@ export default function useMidiEditorMouseFeatures({
 	timeDivision,
 	TOTAL_BEATS,
 	pianoWidth,
-	leftPosition,
-	notes,
 	keyHeight,
 	selectNotesBetweenRowsAndTimes,
+	moveSelectedNotes,
 }) {
 	useEffect(() => {
 		document.addEventListener("mousemove", handleMouseMove);
@@ -35,25 +34,25 @@ export default function useMidiEditorMouseFeatures({
 
 	const {
 		containerRef,
-		startPoint,
-		endPoint,
 		getSelectionBoxStyle,
 		handleSelectionMouseMove,
 		handleSelectionMouseDown,
 		handleSelectionUp,
+		handleSelectionDragStart,
 	} = useMultiNoteSelection({
+		moveSelectedNotes,
 		selectNotesBetweenRowsAndTimes,
-		addNoteAndClearSpaceAsNecessary,
-		notes,
 		pianoWidth,
-		leftPosition,
 		keyHeight,
 	});
 
-	function handleNoteClick(event, keyRowClicked, midiNote) {
+	function handleNoteMouseDown(event, keyRowClicked, midiNote) {
 		if (penModeActivated) {
 			penRemoveBeat(keyRowClicked, midiNote);
 		} else {
+			handleSelectionDragStart(event, keyRowClicked, midiNote);
+			// handleBeatMouseDown(event, keyRowClicked, midiNote);
+			// this breaks when trying to drag the whole selection. need to seperate these components
 		}
 	}
 
@@ -93,7 +92,7 @@ export default function useMidiEditorMouseFeatures({
 	return {
 		containerRef,
 		getSelectionBoxStyle,
-		handleNoteClick,
+		handleNoteMouseDown,
 		handleEmptyTimelineClick,
 		handleMouseMove,
 		handleMouseLeave,

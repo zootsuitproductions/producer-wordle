@@ -6,6 +6,7 @@ function MidiBeat({
 	removeBeat,
 	startTime,
 	endTime,
+	selected,
 	penModeActivated = true,
 	handleMouseDown,
 	width,
@@ -29,8 +30,8 @@ function MidiBeat({
 				width: ((endTime - startTime) / numBeats) * width - 2 + "px",
 				height: `${rowHeight - 2}px`,
 				backgroundColor: correct ? "lightBlue" : "red",
-				borderRadius: "1px",
-				outline: "2px solid black",
+				borderRadius: selected ? "0px" : "1px",
+				outline: selected ? "2px solid white" : "2px solid black",
 			}}
 		></div>
 	);

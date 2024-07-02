@@ -44,8 +44,8 @@ export default function useMidiPen({
 			const index = getBeatIndexOfMouse(event);
 			if (index !== penDragStartIndex && index !== currentlyHoveredIndex) {
 				console.log("start" + penDragStartIndex, "current " + index);
-				let a = Math.min(index, penDragStartIndex);
-				let b = Math.max(index, penDragStartIndex);
+				let a = Math.min(index, currentlyHoveredIndex);
+				let b = Math.max(index, currentlyHoveredIndex);
 				for (let i = a; i <= b; i++) {
 					//disable sound
 					penInNote(keyRowClicked, i);

@@ -14,7 +14,7 @@ export default function useAudioMidiPlayer({
 		() => new (window.AudioContext || window.webkitAudioContext)()
 	);
 
-	const [startTime, setStartTime] = useState(0);
+	const [timeWhenPlaybackStarted, setTimeWhenPlaybackStarted] = useState(0);
 	const [isPlaying, setIsPlaying] = useState(false);
 
 	const [audioBuffers, setAudioBuffers] = useState([]);
@@ -36,9 +36,11 @@ export default function useAudioMidiPlayer({
 
 		newMidiData.forEach((event) => {
 			if (isPlaying) {
-				scheduleMidiNoteEvent(startTime, event);
+				console.log("schedule and playing");
+				scheduleMidiNoteEvent(timeWhenPlaybackStarted, event);
 			} else if (noteSoundOn) {
-				scheduleMidiNoteEvent(0, event);
+				console.log("schedule and sound on");
+				playMidiNoteInstantly(event);
 			}
 		});
 
@@ -57,7 +59,7 @@ export default function useAudioMidiPlayer({
 		midiDataSorted,
 		isPlaying,
 		prevMidiData,
-		startTime,
+		timeWhenPlaybackStarted,
 		setPrevMidiData,
 		noteSources,
 	]);
@@ -92,7 +94,7 @@ export default function useAudioMidiPlayer({
 		noDrumsSource.current.start(currentTime);
 	}
 
-	function scheduleMidiNoteEvent(currentTime, event) {
+	function scheduleMidiNoteEvent(startTime, event) {
 		const { startBeat, note, id } = event;
 		const beatStartSeconds = (startBeat * 60) / bpm;
 
@@ -100,7 +102,21 @@ export default function useAudioMidiPlayer({
 			const source = audioContext.createBufferSource();
 			source.buffer = audioBuffers[note];
 			source.connect(audioContext.destination);
-			source.start(currentTime + beatStartSeconds);
+			source.start(startTime + beatStartSeconds);
+
+			noteSources.current[id] = source;
+		}
+	}
+
+	function playMidiNoteInstantly(event) {
+		const { startBeat, note, id } = event;
+		const beatStartSeconds = (startBeat * 60) / bpm;
+
+		if (beatStartSeconds >= 0) {
+			const source = audioContext.createBufferSource();
+			source.buffer = audioBuffers[note];
+			source.connect(audioContext.destination);
+			source.start();
 
 			noteSources.current[id] = source;
 		}
@@ -143,7 +159,7 @@ export default function useAudioMidiPlayer({
 
 	//todo: playing from non-start
 	function play() {
-		setStartTime(audioContext.currentTime);
+		setTimeWhenPlaybackStarted(audioContext.currentTime);
 		scheduleMIDIPlayback();
 	}
 
@@ -153,7 +169,7 @@ export default function useAudioMidiPlayer({
 	}
 
 	function getCurrentBeat() {
-		const elapsedTime = audioContext.currentTime - startTime;
+		const elapsedTime = audioContext.currentTime - timeWhenPlaybackStarted;
 		return (elapsedTime / 60) * bpm;
 	}
 

@@ -206,22 +206,41 @@ const useMidi = (keys) => {
 	}
 
 	function removeNote(keyIndex, startTime) {
-		const newKeyNotes = [...keytracksData[keyIndex]];
+		setKeytracksData((prevKeytracksData) => {
+			const newKeyNotes = [...prevKeytracksData[keyIndex]];
+			const noteIndex = newKeyNotes.findIndex(
+				(note) => note.startBeat === startTime
+			);
 
-		const noteIndex = newKeyNotes.findIndex(
-			(note) => note.startBeat === startTime
-		);
+			// If the note is found, remove it from the array
+			if (noteIndex !== -1) {
+				newKeyNotes.splice(noteIndex, 1);
 
-		// If the note is found, remove it from the array
-		if (noteIndex !== -1) {
-			newKeyNotes.splice(noteIndex, 1);
-
-			setKeytracksData((prevMidiData) => {
-				const newMidiData = [...prevMidiData]; // Create a shallow copy
+				// setKeytracksData((prevMidiData) => {
+				const newMidiData = [...prevKeytracksData]; // Create a shallow copy
 				newMidiData[keyIndex] = newKeyNotes; // Update the copy with new notes
 				return newMidiData; // Return the updated state
-			});
-		}
+				// });
+			} else {
+				return prevKeytracksData;
+			}
+		});
+		// const newKeyNotes = [...keytracksData[keyIndex]];
+
+		// const noteIndex = newKeyNotes.findIndex(
+		// 	(note) => note.startBeat === startTime
+		// );
+
+		// // If the note is found, remove it from the array
+		// if (noteIndex !== -1) {
+		// 	newKeyNotes.splice(noteIndex, 1);
+
+		// 	setKeytracksData((prevMidiData) => {
+		// 		const newMidiData = [...prevMidiData]; // Create a shallow copy
+		// 		newMidiData[keyIndex] = newKeyNotes; // Update the copy with new notes
+		// 		return newMidiData; // Return the updated state
+		// 	});
+		// }
 	}
 
 	const getKeytracksDataFromLocalStorage = () => {

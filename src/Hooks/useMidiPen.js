@@ -43,11 +43,10 @@ export default function useMidiPen({
 		if (penDragging) {
 			const index = getBeatIndexOfMouse(event);
 			if (index !== penDragStartIndex && index !== currentlyHoveredIndex) {
-				console.log("start" + penDragStartIndex, "current " + index);
 				let a = Math.min(index, currentlyHoveredIndex);
 				let b = Math.max(index, currentlyHoveredIndex);
+
 				for (let i = a; i <= b; i++) {
-					//disable sound
 					penInNote(keyRowClicked, i);
 				}
 
@@ -55,11 +54,17 @@ export default function useMidiPen({
 			}
 		} else if (erasing) {
 			const index = getBeatIndexOfMouse(event);
-			if (index !== currentlyHoveredIndex) {
-				setCurrentlyHoveredIndex(index);
+			if (index !== penDragStartIndex && index !== currentlyHoveredIndex) {
+				let a = Math.min(index, currentlyHoveredIndex);
+				let b = Math.max(index, currentlyHoveredIndex);
 
-				const startOfBeat = (TOTAL_BEATS * index) / timeDivision;
-				removeNote(keyRowClicked, startOfBeat);
+				for (let i = a; i <= b; i++) {
+					// penInNote(keyRowClicked, i);
+					const startOfBeat = (TOTAL_BEATS * i) / timeDivision;
+					removeNote(keyRowClicked, startOfBeat);
+				}
+
+				setCurrentlyHoveredIndex(index);
 			}
 		}
 	}

@@ -8,6 +8,7 @@ function KeyRows({
 	timeDivision,
 	midiDataByNote,
 	addNoteAndClearSpaceAsNecessary,
+	addMultNotesToKeyRow,
 	removeNote,
 	keyHeight,
 	pianoWidth,
@@ -15,6 +16,7 @@ function KeyRows({
 	penModeActivated,
 	moveSelectedNotes,
 	commitSelectionMovement,
+	setStartMarkerTime,
 }) {
 	const {
 		containerRef,
@@ -23,12 +25,14 @@ function KeyRows({
 		handleEmptyTimelineClick,
 		handleMouseLeave,
 	} = useMidiEditorMouseFeatures({
+		setStartMarkerTime,
 		commitSelectionMovement,
 		moveSelectedNotes,
 		selectNotesBetweenRowsAndTimes,
 		keyHeight,
 		penModeActivated,
 		addNoteAndClearSpaceAsNecessary,
+		addMultNotesToKeyRow,
 		removeNote,
 		timeDivision,
 		TOTAL_BEATS,

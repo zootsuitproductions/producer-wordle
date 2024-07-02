@@ -8,6 +8,7 @@ import useAudioMidiPlayer from "../Hooks/useAudioMidiPlayer";
 import useMidi from "../Hooks/useMidi";
 import useMidiEditorKeyControls from "../Hooks/useMidiEditorKeyControls";
 import KeyRows from "./KeyRows";
+import StartMarker from "./StartMarker";
 
 function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 	const MAX_LEFT = leftSidePosition;
@@ -18,6 +19,7 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 	const {
 		midiDataByNote,
 		addNoteAndClearSpaceAsNecessary,
+		addMultNotesToKeyRow,
 		midiDataSorted,
 		checkForCorrectness,
 		saveToLocalStorage,
@@ -25,23 +27,28 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 		selectNotesBetweenRowsAndTimes,
 		moveSelectedNotes,
 		commitSelectionMovement,
+		removeSelectedBeats,
 	} = useMidi(sampleFiles);
 
 	const [bpm, setBpm] = useState(101);
 	const TOTAL_BEATS = 16;
 
-	const { togglePlay, isPlaying, getCurrentBeat } = useAudioMidiPlayer(
+	const { togglePlay, isPlaying, getCurrentBeat } = useAudioMidiPlayer({
 		sampleFiles,
 		midiDataSorted,
 		bpm,
-		TOTAL_BEATS
-	);
+		TOTAL_BEATS,
+	});
 
-	const { timeDivision, penModeActivated } = useMidiEditorKeyControls(
+	const { timeDivision, penModeActivated } = useMidiEditorKeyControls({
 		togglePlay,
 		checkForCorrectness,
-		saveToLocalStorage
-	);
+		saveToLocalStorage,
+		removeSelectedBeats,
+		commitSelectionMovement,
+		TOTAL_BEATS,
+		// timeDivision,
+	});
 
 	useEffect(() => {
 		const handleZoom = (e) => {
@@ -104,8 +111,11 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 		left: `${leftPosition}px`,
 	};
 
+	const [startMarkerTime, setStartMarkerTime] = useState(0.5);
+
 	return (
 		<div style={containerStyle}>
+			<StartMarker timelineWidth={pianoWidth} startPosition={startMarkerTime} />
 			<Playhead
 				timelineWidth={pianoWidth}
 				getCurrentPosition={() => getCurrentBeat() / TOTAL_BEATS}
@@ -118,6 +128,7 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 				timeDivision={timeDivision}
 				midiDataByNote={midiDataByNote}
 				addNoteAndClearSpaceAsNecessary={addNoteAndClearSpaceAsNecessary}
+				addMultNotesToKeyRow={addMultNotesToKeyRow}
 				removeNote={removeNote}
 				keyHeight={keyHeight}
 				pianoWidth={pianoWidth}
@@ -125,7 +136,7 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 				selectNotesBetweenRowsAndTimes={selectNotesBetweenRowsAndTimes}
 				moveSelectedNotes={moveSelectedNotes}
 				commitSelectionMovement={commitSelectionMovement}
-				// onPenDrag
+				setStartMarkerTime={setStartMarkerTime}
 			/>
 		</div>
 	);

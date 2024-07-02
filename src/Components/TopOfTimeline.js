@@ -25,7 +25,9 @@ function TopOfTimeline({ width, timeDivision, height = 60 }) {
 	return (
 		<div className="Row-container" style={{ height: height }}>
 			{Array.from({ length: timeDivision / 2 }).map((_, index) => (
-				<div className="Time-marker">{getDisplayTime(index)}</div>
+				<div key={index} className="Time-marker">
+					{getDisplayTime(index)}
+				</div>
 			))}
 		</div>
 	);

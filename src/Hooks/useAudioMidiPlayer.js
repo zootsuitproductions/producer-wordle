@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 
-export default function useAudioMidiPlayer(
+export default function useAudioMidiPlayer({
 	sampleFiles,
 	midiDataSorted,
 	bpm,
 	TOTAL_BEATS,
-	loop = true
-) {
-	const prevMidiDataRef = useRef([]);
+	loop = true,
+	noteSoundOn = true,
+}) {
+	const [prevMidiData, setPrevMidiData] = useState([]);
 
 	const [audioContext] = useState(
 		() => new (window.AudioContext || window.webkitAudioContext)()
@@ -24,12 +25,6 @@ export default function useAudioMidiPlayer(
 	const noDrumsSource = useRef(null);
 
 	useEffect(() => {
-		const prevMidiData = prevMidiDataRef.current;
-
-		console.log("changed");
-		console.log("prev" + prevMidiData.map((e) => e.id));
-		console.log("sorted" + midiDataSorted.map((e) => e.id));
-
 		const newMidiData = midiDataSorted.filter((event) => {
 			return !prevMidiData.some((prevEvent) => prevEvent.id === event.id);
 		});
@@ -40,7 +35,11 @@ export default function useAudioMidiPlayer(
 		);
 
 		newMidiData.forEach((event) => {
-			scheduleMidiNoteEvent(startTime, event);
+			if (isPlaying) {
+				scheduleMidiNoteEvent(startTime, event);
+			} else if (noteSoundOn) {
+				scheduleMidiNoteEvent(0, event);
+			}
 		});
 
 		removedMidiData.forEach((event) => {
@@ -52,10 +51,16 @@ export default function useAudioMidiPlayer(
 			delete noteSources.current[event.id];
 		});
 
-		// Update the previous midiDataSorted reference
-		//make
-		prevMidiDataRef.current = midiDataSorted;
-	}, [midiDataSorted]);
+		// Update the previous midiDataSorted reference with a deep copy
+		setPrevMidiData(midiDataSorted);
+	}, [
+		midiDataSorted,
+		isPlaying,
+		prevMidiData,
+		startTime,
+		setPrevMidiData,
+		noteSources,
+	]);
 
 	useEffect(() => {
 		async function fetchAudioBuffers() {
@@ -74,7 +79,7 @@ export default function useAudioMidiPlayer(
 			setNoDrumsBuffer(decodedBuffer);
 		}
 		fetchAudioBuffers();
-	}, [audioContext, sampleFiles]);
+	}, [audioContext, setAudioBuffers, sampleFiles]);
 
 	function playNoDrums(currentTime) {
 		try {
@@ -91,12 +96,14 @@ export default function useAudioMidiPlayer(
 		const { startBeat, note, id } = event;
 		const beatStartSeconds = (startBeat * 60) / bpm;
 
-		const source = audioContext.createBufferSource();
-		source.buffer = audioBuffers[note];
-		source.connect(audioContext.destination);
-		source.start(currentTime + beatStartSeconds);
+		if (beatStartSeconds >= 0) {
+			const source = audioContext.createBufferSource();
+			source.buffer = audioBuffers[note];
+			source.connect(audioContext.destination);
+			source.start(currentTime + beatStartSeconds);
 
-		noteSources.current[id] = source;
+			noteSources.current[id] = source;
+		}
 	}
 
 	const scheduleMIDIPlayback = () => {
@@ -109,9 +116,11 @@ export default function useAudioMidiPlayer(
 	};
 
 	const stopAllScheduledNotes = () => {
+		console.log(noteSources.current);
 		Object.values(noteSources.current).forEach((source) => {
 			try {
 				source.stop();
+				console.log("stopped");
 			} catch (error) {
 				console.warn("Source already stopped:", error);
 			}

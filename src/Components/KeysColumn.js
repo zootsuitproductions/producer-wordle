@@ -33,6 +33,7 @@ function KeysColumn({ keys, keyWidth, keyPlusSampleWidth = 200, keyHeight }) {
 
 		keysDisplay.push(
 			<div
+				key={i}
 				style={{
 					display: "flex",
 					flexDirection: "row",

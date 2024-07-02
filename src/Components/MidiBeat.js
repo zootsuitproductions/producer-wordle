@@ -7,7 +7,6 @@ function MidiBeat({
 	startTime,
 	endTime,
 	selected,
-	penModeActivated = true,
 	handleMouseDown,
 	width,
 	rowHeight,
@@ -21,7 +20,6 @@ function MidiBeat({
 	return (
 		<div
 			className={"note"}
-			key={startTime}
 			onDoubleClick={() => handleDoubleClick()}
 			onMouseDown={handleMouseDown}
 			style={{

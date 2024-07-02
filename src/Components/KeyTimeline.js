@@ -48,6 +48,7 @@ function KeyTimeline({
 
 	return (
 		<div
+			key={keyNumber}
 			style={{
 				display: "flex",
 				height: `${rowHeight}px`,
@@ -65,8 +66,9 @@ function KeyTimeline({
 				></div>
 			))}
 
-			{midiNotes.map((midiNote) => (
+			{midiNotes.map((midiNote, index) => (
 				<MidiBeat
+					key={index}
 					selected={midiNote.selected}
 					startTime={midiNote.startBeat}
 					endTime={midiNote.endBeat}

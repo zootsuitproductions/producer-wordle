@@ -63,6 +63,14 @@ body {
   /* left: 300px; */
 }
 
+.startHead {
+  background: rgb(199, 234, 255);
+  width: 1px;
+  height: 100%;
+  position: absolute;
+  /* left: 300px; */
+}
+
 .audio-player-container {
   padding: 20px;
   

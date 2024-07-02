@@ -18,7 +18,7 @@ class MidiNoteEvent {
 		if (!id) {
 			this.id = MidiNoteEvent.getNextId();
 		} // Generate a unique identifier
-		this.selected = false;
+		this.selected = selected;
 	}
 
 	static getNextId() {
@@ -32,6 +32,7 @@ class MidiNoteEvent {
 			endBeat: original.endBeat,
 			velocity: original.velocity,
 			correct: original.correct,
+			selected: original.selected,
 		});
 	}
 }

@@ -17,6 +17,7 @@ function KeyRows({
 	moveSelectedNotes,
 	commitSelectionMovement,
 	setStartMarkerTime,
+	isDisplayingCorrect,
 }) {
 	const {
 		containerRef,
@@ -73,6 +74,7 @@ function KeyRows({
 							rowHeight={keyHeight}
 							width={pianoWidth}
 							penModeActivated={penModeActivated}
+							isDisplayingCorrect={isDisplayingCorrect}
 						/>
 					);
 				})}

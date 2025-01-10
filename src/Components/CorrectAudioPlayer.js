@@ -1,6 +1,10 @@
 import { useState, useRef } from "react";
 import "../App.css";
-export default function CorrectAudioPlayer({ correctAudioFile }) {
+export default function CorrectAudioPlayer({
+	correctAudioFile,
+	currentBpm,
+	songBpm,
+}) {
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [timesPlayed, setTimesPlayed] = useState(0);
 

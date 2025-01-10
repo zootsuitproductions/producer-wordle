@@ -9,6 +9,10 @@ const useMidi = (keys) => {
 	// insert into sorted every time, expose a method to get the single key notes list,
 	function saveToLocalStorage() {
 		localStorage.setItem("correctData", JSON.stringify(keytracksData));
+		localStorage.setItem(
+			"correctMidiNoteEvents",
+			JSON.stringify(midiDataSorted)
+		);
 	}
 
 	useEffect(() => {

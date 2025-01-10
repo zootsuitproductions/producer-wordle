@@ -3,11 +3,55 @@ import { useState, useEffect, useRef } from "react";
 export default function useAudioMidiPlayer({
 	sampleFiles,
 	midiDataSorted,
+	correctData,
 	bpm,
+	noDrumsWav,
+	noDrumsBpm,
+	isDisplayingCorrect,
 	TOTAL_BEATS,
 	loop = true,
 	noteSoundOn = true,
 }) {
+	useEffect(() => {
+		// Update playback position when BPM changes
+		if (isPlaying && noDrumsBuffer && noDrumsSource.current) {
+			console.log("is displaying" + isDisplayingCorrect);
+			togglePlay();
+			// Calculate the elapsed time in beats
+			const elapsedBeats =
+				(audioContext.currentTime - timeWhenPlaybackStarted) / (60 / bpm);
+
+			// Calculate the playback position in seconds based on the new BPM
+			const newPlaybackPositionSeconds = (elapsedBeats * 60) / noDrumsBpm;
+
+			// Stop and restart the noDrumsSource at the new position
+			// try {
+			// 	noDrumsSource.current.stop();
+			// } catch {}
+
+			// noDrumsSource.current = audioContext.createBufferSource();
+			// noDrumsSource.current.buffer = noDrumsBuffer;
+			// noDrumsSource.current.connect(audioContext.destination);
+			// noDrumsSource.current.start(0, newPlaybackPositionSeconds);
+
+			try {
+				noDrumsSource.current.stop();
+			} catch {}
+
+			// noDrumsSource.current = audioContext.createBufferSource();
+			// noDrumsSource.current.buffer = noDrumsBuffer;
+			// noDrumsSource.current.connect(audioContext.destination);
+
+			// // Adjust the playback rate based on the current BPM
+			// const playbackRate = bpm / noDrumsBpm;
+
+			// console.log(playbackRate);
+			// noDrumsSource.current.playbackRate.value = playbackRate;
+
+			// noDrumsSource.current.start(0);
+		}
+	}, [bpm, isDisplayingCorrect]); // Trigger this effect whenever bpm changes
+
 	const [prevMidiData, setPrevMidiData] = useState([]);
 
 	const [audioContext] = useState(
@@ -75,7 +119,9 @@ export default function useAudioMidiPlayer({
 			);
 			setAudioBuffers(buffers);
 			// Fetch and decode the no-drums sample
-			const response = await fetch("end of the road boys no drums.wav");
+			// const response = await fetch("end of the road boys no drums.wav");
+			console.log(noDrumsWav);
+			const response = await fetch(noDrumsWav);
 			const arrayBuffer = await response.arrayBuffer();
 			const decodedBuffer = await audioContext.decodeAudioData(arrayBuffer);
 			setNoDrumsBuffer(decodedBuffer);
@@ -91,6 +137,13 @@ export default function useAudioMidiPlayer({
 		noDrumsSource.current = audioContext.createBufferSource();
 		noDrumsSource.current.buffer = noDrumsBuffer;
 		noDrumsSource.current.connect(audioContext.destination);
+
+		// Adjust the playback rate based on the current BPM
+		const playbackRate = bpm / noDrumsBpm;
+
+		console.log(playbackRate);
+		noDrumsSource.current.playbackRate.value = playbackRate;
+
 		noDrumsSource.current.start(currentTime);
 	}
 
@@ -102,6 +155,9 @@ export default function useAudioMidiPlayer({
 			const source = audioContext.createBufferSource();
 			source.buffer = audioBuffers[note];
 			source.connect(audioContext.destination);
+			const playbackRate = bpm / noDrumsBpm;
+
+			source.playbackRate.value = playbackRate;
 			source.start(startTime + beatStartSeconds);
 
 			noteSources.current[id] = source;
@@ -116,17 +172,20 @@ export default function useAudioMidiPlayer({
 			const source = audioContext.createBufferSource();
 			source.buffer = audioBuffers[note];
 			source.connect(audioContext.destination);
+			const playbackRate = bpm / noDrumsBpm;
+
+			source.playbackRate.value = playbackRate;
 			source.start();
 
 			noteSources.current[id] = source;
 		}
 	}
 
-	const scheduleMIDIPlayback = () => {
+	const scheduleMIDIPlayback = (data) => {
 		const currentTime = audioContext.currentTime;
 		stopAllScheduledNotes(); // I don't know why i need this but i do.
 		playNoDrums(currentTime);
-		midiDataSorted.forEach((event) => {
+		data.forEach((event) => {
 			scheduleMidiNoteEvent(currentTime, event);
 		});
 	};
@@ -160,7 +219,21 @@ export default function useAudioMidiPlayer({
 	//todo: playing from non-start
 	function play() {
 		setTimeWhenPlaybackStarted(audioContext.currentTime);
-		scheduleMIDIPlayback();
+
+		console.log("user ");
+		console.log(midiDataSorted);
+		console.log("correct ");
+		console.log(correctData);
+		console.log(isDisplayingCorrect);
+		// scheduleMIDIPlayback(correctData);
+		if (isDisplayingCorrect) {
+			console.log("correct");
+			scheduleMIDIPlayback(correctData);
+		} else {
+			console.log("user");
+			scheduleMIDIPlayback(midiDataSorted);
+		}
+		// scheduleMIDIPlayback(midiDataSorted);
 	}
 
 	function pause() {

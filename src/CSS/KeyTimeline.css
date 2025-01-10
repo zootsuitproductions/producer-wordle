@@ -1,15 +1,16 @@
 .Beat {
-    border-right: 1px solid #424242;
+    border-right: 2px solid #424242;
     flex: 1;
+  }
+
+  .Black {
+    background-color: #474747;
   }
 
 .Lighter-white {
   background-color: #535353;
 }
 
-.Black {
-  background-color: #474747;
-}
 
 .Lighter-black {
   background-color: #4B4B4B;

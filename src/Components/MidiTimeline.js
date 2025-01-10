@@ -10,7 +10,17 @@ import useMidiEditorKeyControls from "../Hooks/useMidiEditorKeyControls";
 import KeyRows from "./KeyRows";
 import StartMarker from "./StartMarker";
 
-function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
+function MidiTimeline({
+	sampleFiles,
+	leftSidePosition,
+	keyHeight,
+	minWidth,
+	noDrumsWav,
+	noDrumsBpm,
+	bpm,
+	correctData,
+	isDisplayingCorrect,
+}) {
 	const MAX_LEFT = leftSidePosition;
 	const MIN_RIGHT = MAX_LEFT + minWidth;
 	const [pianoWidth, setPianoWidth] = useState(minWidth);
@@ -30,14 +40,23 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 		removeSelectedBeats,
 	} = useMidi(sampleFiles);
 
-	const [bpm, setBpm] = useState(101);
 	const TOTAL_BEATS = 16;
+
+	//todo: Make naming consistent, use an env file
+	const [correctKeytracksData] = useState(() => {
+		const correctKeytracksData = localStorage.getItem("correctData");
+		return correctKeytracksData ? JSON.parse(correctKeytracksData) : []; // Default to an empty array
+	});
 
 	const { togglePlay, isPlaying, getCurrentBeat } = useAudioMidiPlayer({
 		sampleFiles,
 		midiDataSorted,
+		correctData,
 		bpm,
 		TOTAL_BEATS,
+		noDrumsWav,
+		noDrumsBpm,
+		isDisplayingCorrect,
 	});
 
 	const { timeDivision, penModeActivated } = useMidiEditorKeyControls({
@@ -137,6 +156,7 @@ function MidiTimeline({ sampleFiles, leftSidePosition, keyHeight, minWidth }) {
 				moveSelectedNotes={moveSelectedNotes}
 				commitSelectionMovement={commitSelectionMovement}
 				setStartMarkerTime={setStartMarkerTime}
+				isDisplayingCorrect={isDisplayingCorrect}
 			/>
 		</div>
 	);

@@ -12,6 +12,7 @@ function MidiBeat({
 	rowHeight,
 	correct,
 	numBeats = 16,
+	isDisplayingCorrect,
 }) {
 	const handleDoubleClick = () => {
 		removeBeat();
@@ -28,6 +29,7 @@ function MidiBeat({
 				width: ((endTime - startTime) / numBeats) * width - 2 + "px",
 				height: `${rowHeight - 2}px`,
 				backgroundColor: correct ? "lightBlue" : "red",
+				opacity: isDisplayingCorrect ? "0.2" : "1.0",
 				borderRadius: selected ? "0px" : "1px",
 				outline: selected ? "2px solid white" : "2px solid black",
 			}}

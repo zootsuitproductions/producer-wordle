@@ -24,6 +24,25 @@ export default function useMidiEditorKeyControls({
 					case "c":
 						event.preventDefault(); // Prevent default behavior if necessary
 						break;
+					case "2":
+						event.preventDefault();
+						setTimeDivision(timeDivision * 2);
+						break;
+					case "1":
+						event.preventDefault();
+						setTimeDivision(timeDivision / 2);
+						break;
+					case "3":
+						event.preventDefault();
+						if (tripledModeActivated) {
+							setTimeDivision((timeDivision / 3) * 2);
+							setTripletModeActivated(false);
+						} else {
+							setTimeDivision((timeDivision / 2) * 3);
+							setTripletModeActivated(true);
+						}
+						break;
+
 					default:
 						break;
 				}
@@ -34,22 +53,9 @@ export default function useMidiEditorKeyControls({
 						break;
 					case "c":
 						checkForCorrectness();
+						checkForCorrectness();
 						break;
-					case "3":
-						if (tripledModeActivated) {
-							setTimeDivision((timeDivision / 3) * 2);
-							setTripletModeActivated(false);
-						} else {
-							setTimeDivision((timeDivision / 2) * 3);
-							setTripletModeActivated(true);
-						}
-						break;
-					case "2":
-						setTimeDivision(timeDivision * 2);
-						break;
-					case "1":
-						setTimeDivision(timeDivision / 2);
-						break;
+
 					case "b":
 						const body = document.querySelector("body");
 						if (!penModeActivated) {

@@ -26,6 +26,9 @@ export default function useMidiPen({
 
 	function penRemoveBeat(keyRowClicked, midiNote) {
 		removeNote(keyRowClicked, midiNote.startBeat);
+		let index = (midiNote.startBeat * timeDivision) / TOTAL_BEATS;
+		setPenDragStartIndex(index);
+		setCurrentlyHoveredIndex(index);
 		setKeyRowClicked(keyRowClicked);
 		setErasing(true);
 	}
@@ -62,6 +65,7 @@ export default function useMidiPen({
 					// penInNote(keyRowClicked, i);
 					const startOfBeat = (TOTAL_BEATS * i) / timeDivision;
 					removeNote(keyRowClicked, startOfBeat);
+					console.log("removing " + i);
 				}
 
 				setCurrentlyHoveredIndex(index);
@@ -72,6 +76,7 @@ export default function useMidiPen({
 	function handlePenUp() {
 		setPenDragging(false);
 		setErasing(false);
+		setCurrentlyHoveredIndex(null);
 	}
 
 	return {

@@ -16,6 +16,7 @@ function KeyTimeline({
 	timeDivision = 16,
 	numBeats = 16,
 	removeNote,
+	isDisplayingCorrect,
 }) {
 	const [blackKey, setBlackKey] = useState(false);
 
@@ -79,6 +80,7 @@ function KeyTimeline({
 					removeBeat={() => removeNote(keyNumber, midiNote.startBeat)}
 					penModeActivated={penModeActivated}
 					numBars={timeDivision}
+					isDisplayingCorrect={isDisplayingCorrect}
 				/>
 			))}
 		</div>

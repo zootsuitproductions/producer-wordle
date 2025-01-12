@@ -9,6 +9,8 @@ function PianoRoll({
 	noDrumsBpm,
 	correctData,
 	isDisplayingCorrect,
+	penModeActive,
+	setPenModeActive,
 }) {
 	const KEY_HEIGHT = 45;
 	const LEFT_PANEL_WIDTH = 130;
@@ -31,6 +33,8 @@ function PianoRoll({
 				noDrumsWav={noDrumsWav}
 				correctData={correctData}
 				isDisplayingCorrect={isDisplayingCorrect}
+				penModeActive={penModeActive}
+				setPenModeActive={setPenModeActive}
 			/>
 		</div>
 	);

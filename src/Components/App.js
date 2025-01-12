@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import PianoRoll from "./PianoRoll";
 import CorrectAudioPlayer from "./CorrectAudioPlayer";
 import PlaybackTools from "./PlaybackTools";
+import { MidiProvider } from "../Providers/MidiProvider";
 
 function App() {
 	//todo this is bad
@@ -48,6 +49,8 @@ function App() {
 		return storedData ? JSON.parse(storedData) : []; // Default to an empty array
 	});
 
+	const [penModeActive, setPenModeActive] = useState(false);
+
 	return (
 		<div className="App">
 			{/* <CorrectAudioPlayer
@@ -56,21 +59,34 @@ function App() {
 				songBpm={noDrumsBpm}
 			/> */}
 
-			<PlaybackTools
-				bpm={bpm}
-				setBpm={setBpm}
-				isDisplayingCorrect={isDisplayingCorrect}
-				setIsDisplayingCorrect={setIsDisplayingCorrect}
-			/>
 			{sampleFiles && (
-				<PianoRoll
-					keys={sampleFiles}
-					bpm={bpm}
+				<MidiProvider
+					sampleFiles={sampleFiles}
 					noDrumsWav={"hoodvamp_nodrums.wav"}
 					noDrumsBpm={noDrumsBpm}
+					bpm={bpm}
 					correctData={correctData}
 					isDisplayingCorrect={isDisplayingCorrect}
-				/>
+				>
+					<PlaybackTools
+						bpm={bpm}
+						setBpm={setBpm}
+						isDisplayingCorrect={isDisplayingCorrect}
+						setIsDisplayingCorrect={setIsDisplayingCorrect}
+						penModeActive={penModeActive}
+						setPenModeActive={setPenModeActive}
+					/>
+					<PianoRoll
+						keys={sampleFiles}
+						bpm={bpm}
+						noDrumsWav={"hoodvamp_nodrums.wav"}
+						noDrumsBpm={noDrumsBpm}
+						correctData={correctData}
+						isDisplayingCorrect={isDisplayingCorrect}
+						penModeActive={penModeActive}
+						setPenModeActive={setPenModeActive}
+					/>
+				</MidiProvider>
 			)}
 		</div>
 	);

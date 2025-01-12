@@ -4,11 +4,9 @@ import "../App.css";
 import KeyTimeline from "./KeyTimeline";
 import TopOfTimeline from "./TopOfTimeline";
 import Playhead from "./Playhead";
-import useAudioMidiPlayer from "../Hooks/useAudioMidiPlayer";
-import useMidi from "../Hooks/useMidi";
-import useMidiEditorKeyControls from "../Hooks/useMidiEditorKeyControls";
 import KeyRows from "./KeyRows";
 import StartMarker from "./StartMarker";
+import { useMidiContext } from "../Providers/MidiProvider";
 
 function MidiTimeline({
 	sampleFiles,
@@ -26,48 +24,9 @@ function MidiTimeline({
 	const [pianoWidth, setPianoWidth] = useState(minWidth);
 	const [leftPosition, setLeftPosition] = useState(MAX_LEFT);
 
-	const {
-		midiDataByNote,
-		addNoteAndClearSpaceAsNecessary,
-		addMultNotesToKeyRow,
-		midiDataSorted,
-		checkForCorrectness,
-		saveToLocalStorage,
-		removeNote,
-		selectNotesBetweenRowsAndTimes,
-		moveSelectedNotes,
-		commitSelectionMovement,
-		removeSelectedBeats,
-	} = useMidi(sampleFiles);
+	const { midi, audioMidiPlayer, midiEditorKeyControls } = useMidiContext();
 
 	const TOTAL_BEATS = 16;
-
-	//todo: Make naming consistent, use an env file
-	const [correctKeytracksData] = useState(() => {
-		const correctKeytracksData = localStorage.getItem("correctData");
-		return correctKeytracksData ? JSON.parse(correctKeytracksData) : []; // Default to an empty array
-	});
-
-	const { togglePlay, isPlaying, getCurrentBeat } = useAudioMidiPlayer({
-		sampleFiles,
-		midiDataSorted,
-		correctData,
-		bpm,
-		TOTAL_BEATS,
-		noDrumsWav,
-		noDrumsBpm,
-		isDisplayingCorrect,
-	});
-
-	const { timeDivision, penModeActivated } = useMidiEditorKeyControls({
-		togglePlay,
-		checkForCorrectness,
-		saveToLocalStorage,
-		removeSelectedBeats,
-		commitSelectionMovement,
-		TOTAL_BEATS,
-		// timeDivision,
-	});
 
 	useEffect(() => {
 		const handleZoom = (e) => {
@@ -137,24 +96,26 @@ function MidiTimeline({
 			<StartMarker timelineWidth={pianoWidth} startPosition={startMarkerTime} />
 			<Playhead
 				timelineWidth={pianoWidth}
-				getCurrentPosition={() => getCurrentBeat() / TOTAL_BEATS}
-				isPlaying={isPlaying}
+				getCurrentPosition={() =>
+					audioMidiPlayer.getCurrentBeat() / TOTAL_BEATS
+				}
+				isPlaying={audioMidiPlayer.isPlaying}
 			/>
-			<TopOfTimeline timeDivision={timeDivision} />
+			<TopOfTimeline timeDivision={midiEditorKeyControls.timeDivision} />
 			<KeyRows
 				sampleFiles={sampleFiles}
 				TOTAL_BEATS={TOTAL_BEATS}
-				timeDivision={timeDivision}
-				midiDataByNote={midiDataByNote}
-				addNoteAndClearSpaceAsNecessary={addNoteAndClearSpaceAsNecessary}
-				addMultNotesToKeyRow={addMultNotesToKeyRow}
-				removeNote={removeNote}
+				timeDivision={midiEditorKeyControls.timeDivision}
+				midiDataByNote={midi.midiDataByNote}
+				addNoteAndClearSpaceAsNecessary={midi.addNoteAndClearSpaceAsNecessary}
+				addMultNotesToKeyRow={midi.addMultNotesToKeyRow}
+				removeNote={midi.removeNote}
 				keyHeight={keyHeight}
 				pianoWidth={pianoWidth}
-				penModeActivated={penModeActivated}
-				selectNotesBetweenRowsAndTimes={selectNotesBetweenRowsAndTimes}
-				moveSelectedNotes={moveSelectedNotes}
-				commitSelectionMovement={commitSelectionMovement}
+				penModeActivated={midiEditorKeyControls.penModeActivated}
+				selectNotesBetweenRowsAndTimes={midi.selectNotesBetweenRowsAndTimes}
+				moveSelectedNotes={midi.moveSelectedNotes}
+				commitSelectionMovement={midi.commitSelectionMovement}
 				setStartMarkerTime={setStartMarkerTime}
 				isDisplayingCorrect={isDisplayingCorrect}
 			/>

@@ -12,6 +12,15 @@ export default function useMidiEditorKeyControls({
 	const [penModeActivated, setPenModeActivated] = useState(false);
 	const [tripledModeActivated, setTripletModeActivated] = useState(false);
 
+	function togglePenMode() {
+		const body = document.querySelector("body");
+		if (!penModeActivated) {
+			body.style.cursor = "crosshair";
+		} else {
+			body.style.cursor = "auto";
+		}
+		setPenModeActivated(!penModeActivated);
+	}
 	//useMidiClipboard
 
 	useEffect(() => {
@@ -57,13 +66,7 @@ export default function useMidiEditorKeyControls({
 						break;
 
 					case "b":
-						const body = document.querySelector("body");
-						if (!penModeActivated) {
-							body.style.cursor = "crosshair";
-						} else {
-							body.style.cursor = "auto";
-						}
-						setPenModeActivated(!penModeActivated);
+						togglePenMode();
 						break;
 					case " ":
 						togglePlay();
@@ -101,5 +104,6 @@ export default function useMidiEditorKeyControls({
 	return {
 		timeDivision,
 		penModeActivated,
+		togglePenMode,
 	};
 }

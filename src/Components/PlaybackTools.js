@@ -1,6 +1,7 @@
 import React from "react";
 import "../App.css";
 import PlaybackModeToggle from "./PlaybackModeToggle";
+import { useMidiContext } from "../Providers/MidiProvider";
 
 function PlaybackTools({
 	bpm,
@@ -8,6 +9,8 @@ function PlaybackTools({
 	isDisplayingCorrect,
 	setIsDisplayingCorrect,
 }) {
+	const { audioMidiPlayer, midiEditorKeyControls } = useMidiContext();
+
 	// Handler to increase the tempo
 	const increaseBpm = (e) => {
 		e.target.blur(); // Remove focus from the button
@@ -26,6 +29,18 @@ function PlaybackTools({
 		setIsDisplayingCorrect((prev) => !prev);
 	};
 
+	// Handler to toggle playback
+	const togglePlayback = (e) => {
+		e.target.blur(); // Remove focus from the button
+		audioMidiPlayer.togglePlay();
+	};
+
+	// Handler to toggle pen mode
+	const togglePenMode = (e) => {
+		e.target.blur(); // Remove focus from the button
+		midiEditorKeyControls.togglePenMode((prev) => !prev);
+	};
+
 	return (
 		<div className="playback-tools">
 			<div className="bpm-controls">
@@ -42,6 +57,14 @@ function PlaybackTools({
 					setIsDisplayingCorrect={setIsDisplayingCorrect}
 				/>
 			</div>
+			<button onClick={togglePlayback} className="playback-button">
+				{audioMidiPlayer.isPlaying ? "Pause" : "Play"}
+			</button>
+			<button onClick={togglePenMode} className="playback-button">
+				{midiEditorKeyControls.penModeActivated
+					? "Disable Pen Mode"
+					: "Enable Pen Mode"}
+			</button>
 		</div>
 	);
 }

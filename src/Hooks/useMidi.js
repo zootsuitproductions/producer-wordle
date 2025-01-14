@@ -276,6 +276,9 @@ const useMidi = (keys) => {
 					if (!isCorrect) {
 						numIncorrect1++;
 					}
+					if (isCorrect) {
+						return noteEvent;
+					}
 					return new MidiNoteEvent({
 						...noteEvent,
 						endBeat: endBeat,

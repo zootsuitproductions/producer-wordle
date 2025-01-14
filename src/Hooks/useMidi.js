@@ -5,6 +5,9 @@ import MidiNoteEvent from "../Models/MidiNoteEvent";
 const useMidi = (keys) => {
 	const [keytracksData, setKeytracksData] = useState(keys.map(() => []));
 	const [midiDataSorted, setMidiDataSorted] = useState([]);
+
+	const [numIncorrect, setNumIncorrect] = useState(0);
+
 	//todo: SSoT. dekete midiDataByNote.
 	// insert into sorted every time, expose a method to get the single key notes list,
 	function saveToLocalStorage() {
@@ -253,6 +256,7 @@ const useMidi = (keys) => {
 	};
 
 	function checkForCorrectness() {
+		let numIncorrect1 = 0;
 		const correctKeytracksData = getKeytracksDataFromLocalStorage();
 		setKeytracksData((prevKeyTracks) => {
 			return prevKeyTracks.map((userKeytrack, noteIndex) => {
@@ -269,6 +273,9 @@ const useMidi = (keys) => {
 							break;
 						}
 					}
+					if (!isCorrect) {
+						numIncorrect1++;
+					}
 					return new MidiNoteEvent({
 						...noteEvent,
 						endBeat: endBeat,
@@ -279,6 +286,42 @@ const useMidi = (keys) => {
 				return correctedKeytrack;
 			});
 		});
+
+		setNumIncorrect(numIncorrect1);
+		return numIncorrect1;
+	}
+
+	function getNumberOfNotesUserIsMissing() {
+		let numIncorrect1 = 0;
+		const correctKeytracksData = getKeytracksDataFromLocalStorage();
+		correctKeytracksData.forEach((correctKeytrack, noteIndex) => {
+			const userKeytrack = keytracksData[noteIndex];
+			// console.log(correctKeytrack);
+
+			const _ = correctKeytrack.map((noteEvent) => {
+				let isCorrect = false;
+				let endBeat = noteEvent.endBeat;
+				for (let userNoteEvent of userKeytrack) {
+					if (noteEvent.startBeat === userNoteEvent.startBeat) {
+						isCorrect = true;
+						endBeat = userNoteEvent.endBeat;
+						break;
+					}
+				}
+				if (!isCorrect) {
+					numIncorrect1++;
+				}
+				return new MidiNoteEvent({
+					...noteEvent,
+					endBeat: endBeat,
+					correct: isCorrect,
+				});
+			});
+		});
+
+		//count the number of notes in each keytrack
+		//if the count is not the same, return false
+		return numIncorrect1;
 	}
 
 	return {
@@ -293,6 +336,8 @@ const useMidi = (keys) => {
 		midiDataSorted,
 		moveSelectedNotes,
 		commitSelectionMovement,
+		numIncorrect,
+		getNumberOfNotesUserIsMissing,
 	};
 };
 

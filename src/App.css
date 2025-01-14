@@ -119,6 +119,17 @@ body {
 	cursor: pointer;
 }
 
+.check-button {
+	background-color: white;
+	color: black;
+	border: none;
+	padding: 10px 20px;
+	margin: 0 10px;
+	font-size: 16px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
 .playback-button:hover {
 	background-color: #0056b3;
 }
@@ -162,10 +173,10 @@ body {
 	margin-top: 10px;
 }
 
+
 .toggle-switch {
 	width: 50px;
 	height: 24px;
-	/* background-color: #ccc; */
 	border-radius: 12px;
   border: white;
 	position: relative;
@@ -201,3 +212,13 @@ body {
 	color: #333;
 }
 
+.moves-counter {
+  color: white;
+}
+
+
+.toggle-label {
+  padding: 8px;
+  color: white;
+  font-size: 20px;
+}

@@ -15,9 +15,16 @@
 	width: 50%;
 	height: 100%;
 	background-color: #007bff; /* Border color */
+	border: 1px solid #007bff;
 	transition: transform 0.3s ease; /* Smooth animation */
 	z-index: 1;
 }
+
+.toggle-container {
+
+	border: 1px solid #007bff;
+  }
+  
 
 .toggle-button {
 	flex: 1;
@@ -28,7 +35,7 @@
 	font-size: 16px;
 	cursor: pointer;
 	outline: none;
-	color: gray;
+	color: #4b7aac;
 	font-weight: bold;
 }
 

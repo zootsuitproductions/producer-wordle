@@ -216,18 +216,15 @@ export default function useAudioMidiPlayer({
 		});
 	}
 
+	const [correctAudioTimesPlayed, setCorrectAudioTimesPlayed] = useState(0);
+
 	//todo: playing from non-start
 	function play() {
 		setTimeWhenPlaybackStarted(audioContext.currentTime);
-
-		console.log("user ");
-		console.log(midiDataSorted);
-		console.log("correct ");
-		console.log(correctData);
-		console.log(isDisplayingCorrect);
 		// scheduleMIDIPlayback(correctData);
 		if (isDisplayingCorrect) {
 			console.log("correct");
+			setCorrectAudioTimesPlayed((prev) => prev + 1);
 			scheduleMIDIPlayback(correctData);
 		} else {
 			console.log("user");
@@ -250,5 +247,6 @@ export default function useAudioMidiPlayer({
 		togglePlay,
 		isPlaying,
 		getCurrentBeat,
+		correctAudioTimesPlayed,
 	};
 }

@@ -9,8 +9,15 @@ export default function useMidiEditorKeyControls({
 	TOTAL_BEATS,
 }) {
 	const [timeDivision, setTimeDivision] = useState(32);
-	const [penModeActivated, setPenModeActivated] = useState(false);
-	const [tripledModeActivated, setTripletModeActivated] = useState(false);
+	const [penModeActivated, setPenModeActivated] = useState(true);
+	const [tripletModeActivated, setTripletModeActivated] = useState(false);
+
+	useEffect(() => {
+		if (penModeActivated) {
+			const body = document.querySelector("body");
+			body.style.cursor = "crosshair";
+		}
+	}, []);
 
 	function togglePenMode() {
 		const body = document.querySelector("body");
@@ -21,7 +28,23 @@ export default function useMidiEditorKeyControls({
 		}
 		setPenModeActivated(!penModeActivated);
 	}
-	//useMidiClipboard
+
+	function halveTimeDivision() {
+		setTimeDivision((prev) => prev / 2);
+	}
+
+	function doubleTimeDivision() {
+		setTimeDivision((prev) => prev * 2);
+	}
+
+	function toggleTripletMode() {
+		if (tripletModeActivated) {
+			setTimeDivision((prev) => (prev / 3) * 2);
+		} else {
+			setTimeDivision((prev) => (prev / 2) * 3);
+		}
+		setTripletModeActivated((prev) => !prev);
+	}
 
 	useEffect(() => {
 		const handleKeyPress = (event) => {
@@ -35,21 +58,15 @@ export default function useMidiEditorKeyControls({
 						break;
 					case "2":
 						event.preventDefault();
-						setTimeDivision(timeDivision * 2);
+						doubleTimeDivision();
 						break;
 					case "1":
 						event.preventDefault();
-						setTimeDivision(timeDivision / 2);
+						halveTimeDivision();
 						break;
 					case "3":
 						event.preventDefault();
-						if (tripledModeActivated) {
-							setTimeDivision((timeDivision / 3) * 2);
-							setTripletModeActivated(false);
-						} else {
-							setTimeDivision((timeDivision / 2) * 3);
-							setTripletModeActivated(true);
-						}
+						toggleTripletMode();
 						break;
 
 					default:
@@ -61,8 +78,10 @@ export default function useMidiEditorKeyControls({
 						saveToLocalStorage();
 						break;
 					case "c":
-						checkForCorrectness();
-						checkForCorrectness();
+						// console.log("INCORRECT: ");
+						// console.log(checkForCorrectness());
+
+						// checkForCorrectness();
 						break;
 
 					case "b":
@@ -94,7 +113,7 @@ export default function useMidiEditorKeyControls({
 	}, [
 		timeDivision,
 		penModeActivated,
-		tripledModeActivated,
+		tripletModeActivated,
 		togglePlay,
 		saveToLocalStorage,
 		removeSelectedBeats,
@@ -105,5 +124,9 @@ export default function useMidiEditorKeyControls({
 		timeDivision,
 		penModeActivated,
 		togglePenMode,
+		halveTimeDivision,
+		doubleTimeDivision,
+		toggleTripletMode,
+		tripletModeActivated,
 	};
 }

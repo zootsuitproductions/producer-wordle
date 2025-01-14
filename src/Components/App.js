@@ -53,12 +53,6 @@ function App() {
 
 	return (
 		<div className="App">
-			{/* <CorrectAudioPlayer
-				correctAudioFile={"hoodvamp.wav"}
-				currentBpm={bpm}
-				songBpm={noDrumsBpm}
-			/> */}
-
 			{sampleFiles && (
 				<MidiProvider
 					sampleFiles={sampleFiles}
@@ -68,6 +62,20 @@ function App() {
 					correctData={correctData}
 					isDisplayingCorrect={isDisplayingCorrect}
 				>
+					<h3
+						style={{
+							color: "white",
+							paddingBottom: "20px",
+							background: "black",
+						}}
+					>
+						Draw in the drums from the Correct Beat in under 30 moves to win!
+						<div style={{ fontSize: "12px", paddingTop: "5px" }}>
+							(Hearing the Correct Beat constitutes 1 move, slowing the tempo
+							down counts as 5, and checking for correctness counts as 1 move
+							per incorrect note)
+						</div>
+					</h3>
 					<PlaybackTools
 						bpm={bpm}
 						setBpm={setBpm}

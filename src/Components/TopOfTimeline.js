@@ -16,19 +16,24 @@ function TopOfTimeline({ width, timeDivision, height = 60 }) {
 			case 0.75:
 				displayTime += 0.3;
 				break;
+			case 0:
+				break;
+			default:
+				displayTime = "";
+				break;
 		}
 		return displayTime;
 	};
 
-	console.log("re render!!");
-
 	return (
 		<div className="Row-container" style={{ height: height }}>
-			{Array.from({ length: timeDivision / 2 }).map((_, index) => (
-				<div key={index} className="Time-marker">
-					{getDisplayTime(index)}
-				</div>
-			))}
+			{Array.from({ length: timeDivision / 2 }).map((_, index) =>
+				getDisplayTime(index) === "" ? null : (
+					<div key={index} className="Time-marker">
+						{getDisplayTime(index)}
+					</div>
+				)
+			)}
 		</div>
 	);
 }

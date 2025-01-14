@@ -7,26 +7,31 @@ function PlaybackModeToggle({ isDisplayingCorrect, setIsDisplayingCorrect }) {
 	};
 
 	return (
-		<div className="toggle-container">
-			<div
-				className="toggle-border"
-				style={{
-					transform: isDisplayingCorrect ? "translateX(100%)" : "translateX(0)",
-				}}
-			></div>
-			<button
-				className={`toggle-button ${!isDisplayingCorrect ? "active" : ""}`}
-				onClick={() => handleModeChange("edit")}
-			>
-				Edit
-			</button>
-			<button
-				className={`toggle-button ${isDisplayingCorrect ? "active" : ""}`}
-				onClick={() => handleModeChange("listen")}
-			>
-				Listen
-			</button>
-		</div>
+		<>
+			<div className="toggle-label">Playback: </div>
+			<div className="toggle-container">
+				<div
+					className="toggle-border"
+					style={{
+						transform: isDisplayingCorrect
+							? "translateX(100%)"
+							: "translateX(0)",
+					}}
+				></div>
+				<button
+					className={`toggle-button ${!isDisplayingCorrect ? "active" : ""}`}
+					onClick={() => handleModeChange("edit")}
+				>
+					Your Pattern
+				</button>
+				<button
+					className={`toggle-button ${isDisplayingCorrect ? "active" : ""}`}
+					onClick={() => handleModeChange("listen")}
+				>
+					Correct Beat
+				</button>
+			</div>
+		</>
 	);
 }
 

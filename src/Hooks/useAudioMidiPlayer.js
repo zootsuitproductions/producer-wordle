@@ -245,7 +245,13 @@ export default function useAudioMidiPlayer({
 
 	function getCurrentBeat() {
 		const elapsedTime = audioContext.currentTime - timeWhenPlaybackStarted;
-		return (elapsedTime / 60) * bpm + beatStartedAt;
+		const beat = (elapsedTime / 60) * bpm + beatStartedAt;
+		if (beat > TOTAL_BEATS) {
+			if (isPlaying) {
+				togglePlay();
+			}
+		}
+		return beat;
 	}
 
 	function playFromBeat(beat) {

@@ -73,7 +73,7 @@ function App() {
 					>
 						Draw in the drums from the Correct Beat in under 30 moves to win!
 						<div style={{ fontSize: "12px", paddingTop: "5px" }}>
-							(Hearing the Correct Beat constitutes 1 move, slowing the tempo
+							(Playing the Correct Beat constitutes 1 move, slowing the tempo
 							down counts as 5, and checking for correctness counts as 1 move
 							per note you get wrong)
 						</div>

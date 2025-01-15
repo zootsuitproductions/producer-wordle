@@ -106,7 +106,7 @@ function MidiTimeline({
 			<Playhead
 				timelineWidth={pianoWidth}
 				getCurrentPosition={() =>
-					audioMidiPlayer.getCurrentBeat() / TOTAL_BEATS
+					Math.min(audioMidiPlayer.getCurrentBeat() / TOTAL_BEATS, 1)
 				}
 				isPlaying={audioMidiPlayer.isPlaying}
 			/>

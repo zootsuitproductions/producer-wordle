@@ -23,6 +23,7 @@ function MidiTimeline({
 	const MIN_RIGHT = MAX_LEFT + minWidth;
 	const [pianoWidth, setPianoWidth] = useState(minWidth);
 	const [leftPosition, setLeftPosition] = useState(MAX_LEFT);
+	const [widthOfLastGridChange, setWidthOfLastGridChange] = useState(minWidth);
 
 	const { midi, audioMidiPlayer, midiEditorKeyControls } = useMidiContext();
 
@@ -48,6 +49,14 @@ function MidiTimeline({
 					pianoWidth + scaleFactor * e.deltaY,
 					minWidth
 				); // make sure its not smaller than min width
+
+				if (newPianoWidth <= 0.25 * widthOfLastGridChange) {
+					midiEditorKeyControls.halveTimeDivision();
+					setWidthOfLastGridChange(newPianoWidth);
+				} else if (newPianoWidth >= 4 * widthOfLastGridChange) {
+					midiEditorKeyControls.doubleTimeDivision();
+					setWidthOfLastGridChange(newPianoWidth);
+				}
 
 				const newMouseRelative = fractionOfBox * newPianoWidth;
 				const newLeftPosition = Math.min(mouseX - newMouseRelative, MAX_LEFT);

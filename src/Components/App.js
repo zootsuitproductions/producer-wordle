@@ -75,7 +75,7 @@ function App() {
 						<div style={{ fontSize: "12px", paddingTop: "5px" }}>
 							(Hearing the Correct Beat constitutes 1 move, slowing the tempo
 							down counts as 5, and checking for correctness counts as 1 move
-							per incorrect note)
+							per note you get wrong)
 						</div>
 					</h3>
 					<PlaybackTools

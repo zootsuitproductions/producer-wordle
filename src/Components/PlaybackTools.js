@@ -62,7 +62,15 @@ function PlaybackTools({
 
 		//todo: make the notes turn green if they got it right
 		if (incorrectNotes === 0 && midi.getNumberOfNotesUserIsMissing() === 0) {
-			window.alert("You got it right in " + numMoves + " moves!");
+			if (numMoves <= 30) {
+				window.alert("You got it right in " + numMoves + " moves! You win!");
+			} else {
+				window.alert(
+					"You got it right in " +
+						numMoves +
+						" moves. You still lose though haha"
+				);
+			}
 		} else {
 			window.alert(
 				"You got " +

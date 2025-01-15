@@ -294,6 +294,15 @@ const useMidi = (keys) => {
 					let isCorrect = false;
 					let endBeat = noteEvent.endBeat;
 					for (let correctNoteEvent of correctKeytrack) {
+						if (noteEvent.startBeat < 0) {
+							numIncorrect1++;
+							return new MidiNoteEvent({
+								...noteEvent,
+								startBeat: 0,
+								endBeat: endBeat,
+								correct: false,
+							});
+						}
 						if (noteEvent.startBeat === correctNoteEvent.startBeat) {
 							isCorrect = true;
 							// endBeat = correctNoteEvent.endBeat;

@@ -116,28 +116,66 @@ function PlaybackTools({
 					isDisplayingCorrect={isDisplayingCorrect}
 					setIsDisplayingCorrect={setIsDisplayingCorrect}
 				/>
-				<button onClick={togglePlayback} className="playback-button">
-					{audioMidiPlayer.isPlaying ? "Pause (space)" : "Play (space)"}
+
+				<button
+					onClick={togglePlayback}
+					style={{
+						background: "transparent",
+						border: "none",
+						marginInline: 10,
+					}}
+				>
+					{audioMidiPlayer.isPlaying ? (
+						<img
+							src="icons8-pause-50.png"
+							alt="Pause"
+							draggable="false"
+							tabIndex="-1"
+							style={{ cursor: "pointer" }}
+						/>
+					) : (
+						<img
+							src="icons8-play-50.png"
+							alt="Play"
+							draggable="false"
+							tabIndex="-1"
+							style={{ cursor: "pointer" }}
+						/>
+					)}
 				</button>
-				<button onClick={togglePenMode} className="playback-button">
+
+				{/* <button onClick={togglePenMode} className="playback-button">
 					{midiEditorKeyControls.penModeActivated
 						? "Disable Pen Mode (b)"
 						: "Enable Pen Mode (b)"}
+				</button> */}
+
+				<button className="playback-button" onClick={togglePenMode}>
+					<input
+						type="checkbox"
+						checked={midiEditorKeyControls.penModeActivated}
+					/>
+					Pen Mode
 				</button>
 
 				<div></div>
 				<div className="toggle-label">Grid: </div>
+
 				<button onClick={halveTimeDivision} className="playback-button">
-					Halve (Cmd 1)
+					*2
 				</button>
 				<button onClick={doubleTimeDivision} className="playback-button">
-					Double (Cmd 2)
+					1/2
 				</button>
-				<button onClick={toggleTripletMode} className="playback-button">
-					{midiEditorKeyControls.tripletModeActivated
-						? "Disable Triplets (Cmd 3)"
-						: "Enable Triplets (Cmd 3)"}
+
+				<button className="playback-button" onClick={toggleTripletMode}>
+					<input
+						type="checkbox"
+						checked={midiEditorKeyControls.tripletModeActivated}
+					/>
+					1/3
 				</button>
+
 				<button onClick={checkForCorrectness} className="check-button">
 					Check Correctness
 				</button>

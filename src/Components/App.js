@@ -71,7 +71,7 @@ function App() {
 							background: "black",
 						}}
 					>
-						Draw in the drums from the Correct Beat in under 30 moves to win!
+						Draw in the drums from the Correct Beat in under 40 moves to win!
 						<div style={{ fontSize: "12px", paddingTop: "5px" }}>
 							(Playing the Correct Beat constitutes 1 move, slowing the tempo
 							down counts as 5, and checking for correctness counts as 1 move

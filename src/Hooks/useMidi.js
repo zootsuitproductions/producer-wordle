@@ -290,37 +290,35 @@ const useMidi = (keys) => {
 				const correctKeytrack = correctKeytracksData[noteIndex];
 				console.log(correctKeytrack);
 
-				const correctedKeytrack = userKeytrack.map((noteEvent) => {
-					let isCorrect = false;
-					let endBeat = noteEvent.endBeat;
-					for (let correctNoteEvent of correctKeytrack) {
-						if (noteEvent.startBeat < 0) {
+				const correctedKeytrack = userKeytrack
+					.filter((noteEvent) => {
+						if (noteEvent.startBeat < 0 || noteEvent.endBeat > 16) {
+							return false; // Exclude this noteEvent
+						}
+						return true;
+					})
+					.map((noteEvent) => {
+						let isCorrect = false;
+						let endBeat = noteEvent.endBeat;
+						for (let correctNoteEvent of correctKeytrack) {
+							if (noteEvent.startBeat === correctNoteEvent.startBeat) {
+								isCorrect = true;
+								// endBeat = correctNoteEvent.endBeat;
+								break;
+							}
+						}
+						if (!isCorrect) {
 							numIncorrect1++;
-							return new MidiNoteEvent({
-								...noteEvent,
-								startBeat: 0,
-								endBeat: endBeat,
-								correct: false,
-							});
 						}
-						if (noteEvent.startBeat === correctNoteEvent.startBeat) {
-							isCorrect = true;
-							// endBeat = correctNoteEvent.endBeat;
-							break;
+						if (isCorrect) {
+							return noteEvent;
 						}
-					}
-					if (!isCorrect) {
-						numIncorrect1++;
-					}
-					if (isCorrect) {
-						return noteEvent;
-					}
-					return new MidiNoteEvent({
-						...noteEvent,
-						endBeat: endBeat,
-						correct: isCorrect,
+						return new MidiNoteEvent({
+							...noteEvent,
+							endBeat: endBeat,
+							correct: isCorrect,
+						});
 					});
-				});
 
 				return correctedKeytrack;
 			});

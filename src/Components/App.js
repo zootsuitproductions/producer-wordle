@@ -6,6 +6,7 @@ import PianoRoll from "./PianoRoll";
 import CorrectAudioPlayer from "./CorrectAudioPlayer";
 import PlaybackTools from "./PlaybackTools";
 import { MidiProvider } from "../Providers/MidiProvider";
+import { getCorrectMidiNoteEvents } from "../Services/fallbackData";
 
 function App() {
 	//todo this is bad
@@ -45,8 +46,9 @@ function App() {
 	const [isDisplayingCorrect, setIsDisplayingCorrect] = useState(false);
 
 	const [correctData] = useState(() => {
-		const storedData = localStorage.getItem("correctMidiNoteEvents");
-		return storedData ? JSON.parse(storedData) : []; // Default to an empty array
+		// const storedData = localStorage.getItem("correctMidiNoteEvents");
+		return getCorrectMidiNoteEvents();
+		// return storedData ? JSON.parse() : []; // Default to an empty array
 	});
 
 	const [penModeActive, setPenModeActive] = useState(false);

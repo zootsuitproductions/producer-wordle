@@ -33,6 +33,7 @@ export const MidiProvider = ({
 		removeSelectedBeats: midi.removeSelectedBeats,
 		commitSelectionMovement: midi.commitSelectionMovement,
 		TOTAL_BEATS,
+		saveToJSONFile: midi.saveToJSONFile,
 	});
 
 	return (

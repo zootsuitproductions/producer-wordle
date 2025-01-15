@@ -6,7 +6,7 @@ export default function useAudioMidiPlayer({
 	correctData,
 	bpm,
 	noDrumsWav,
-	noDrumsBpm,
+	noDrumsBpm: originalBpm,
 	isDisplayingCorrect,
 	TOTAL_BEATS,
 	loop = true,
@@ -22,7 +22,7 @@ export default function useAudioMidiPlayer({
 				(audioContext.currentTime - timeWhenPlaybackStarted) / (60 / bpm);
 
 			// Calculate the playback position in seconds based on the new BPM
-			const newPlaybackPositionSeconds = (elapsedBeats * 60) / noDrumsBpm;
+			const newPlaybackPositionSeconds = (elapsedBeats * 60) / originalBpm;
 
 			// Stop and restart the noDrumsSource at the new position
 			// try {
@@ -129,7 +129,7 @@ export default function useAudioMidiPlayer({
 		fetchAudioBuffers();
 	}, [audioContext, setAudioBuffers, sampleFiles]);
 
-	function playNoDrums(currentTime) {
+	function playNoDrums(currentTime, beatOffset = 0) {
 		try {
 			noDrumsSource.current.stop();
 		} catch {}
@@ -139,23 +139,25 @@ export default function useAudioMidiPlayer({
 		noDrumsSource.current.connect(audioContext.destination);
 
 		// Adjust the playback rate based on the current BPM
-		const playbackRate = bpm / noDrumsBpm;
-
-		console.log(playbackRate);
+		const playbackRate = bpm / originalBpm;
 		noDrumsSource.current.playbackRate.value = playbackRate;
 
-		noDrumsSource.current.start(currentTime);
+		// Calculate the offset time in seconds
+		const offsetTime = (beatOffset / bpm) * 60;
+
+		console.log(playbackRate, offsetTime);
+		noDrumsSource.current.start(currentTime, offsetTime);
 	}
 
-	function scheduleMidiNoteEvent(startTime, event) {
+	function scheduleMidiNoteEvent(startTime, event, beatOffset = 0) {
 		const { startBeat, note, id } = event;
-		const beatStartSeconds = (startBeat * 60) / bpm;
+		const beatStartSeconds = ((startBeat - beatOffset) * 60) / bpm;
 
 		if (beatStartSeconds >= 0) {
 			const source = audioContext.createBufferSource();
 			source.buffer = audioBuffers[note];
 			source.connect(audioContext.destination);
-			const playbackRate = bpm / noDrumsBpm;
+			const playbackRate = bpm / originalBpm;
 
 			source.playbackRate.value = playbackRate;
 			source.start(startTime + beatStartSeconds);
@@ -172,7 +174,7 @@ export default function useAudioMidiPlayer({
 			const source = audioContext.createBufferSource();
 			source.buffer = audioBuffers[note];
 			source.connect(audioContext.destination);
-			const playbackRate = bpm / noDrumsBpm;
+			const playbackRate = bpm / originalBpm;
 
 			source.playbackRate.value = playbackRate;
 			source.start();
@@ -181,12 +183,12 @@ export default function useAudioMidiPlayer({
 		}
 	}
 
-	const scheduleMIDIPlayback = (data) => {
+	const scheduleMIDIPlayback = (data, beatOffset = 0) => {
 		const currentTime = audioContext.currentTime;
 		stopAllScheduledNotes(); // I don't know why i need this but i do.
-		playNoDrums(currentTime);
+		playNoDrums(currentTime, beatOffset);
 		data.forEach((event) => {
-			scheduleMidiNoteEvent(currentTime, event);
+			scheduleMidiNoteEvent(currentTime, event, beatOffset);
 		});
 	};
 
@@ -203,32 +205,35 @@ export default function useAudioMidiPlayer({
 		noteSources.current = {}; // Clear the ref
 	};
 
-	function togglePlay() {
+	function togglePlay(beatStartTime = 0) {
+		// alert(beatStartTime);
 		setIsPlaying((prevIsPlaying) => {
 			if (prevIsPlaying) {
 				console.log("pause");
 				pause();
 			} else {
 				console.log("play");
-				play();
+				play(beatStartTime);
 			}
 			return !prevIsPlaying;
 		});
 	}
 
 	const [correctAudioTimesPlayed, setCorrectAudioTimesPlayed] = useState(0);
+	const [beatStartedAt, setBeatStartedAt] = useState(0);
 
 	//todo: playing from non-start
-	function play() {
+	function play(beatStartTime = 0) {
 		setTimeWhenPlaybackStarted(audioContext.currentTime);
+		setBeatStartedAt(beatStartTime);
 		// scheduleMIDIPlayback(correctData);
 		if (isDisplayingCorrect) {
 			console.log("correct");
 			setCorrectAudioTimesPlayed((prev) => prev + 1);
-			scheduleMIDIPlayback(correctData);
+			scheduleMIDIPlayback(correctData, beatStartTime);
 		} else {
 			console.log("user");
-			scheduleMIDIPlayback(midiDataSorted);
+			scheduleMIDIPlayback(midiDataSorted, beatStartTime);
 		}
 		// scheduleMIDIPlayback(midiDataSorted);
 	}
@@ -240,7 +245,11 @@ export default function useAudioMidiPlayer({
 
 	function getCurrentBeat() {
 		const elapsedTime = audioContext.currentTime - timeWhenPlaybackStarted;
-		return (elapsedTime / 60) * bpm;
+		return (elapsedTime / 60) * bpm + beatStartedAt;
+	}
+
+	function playFromBeat(beat) {
+		scheduleMIDIPlayback(correctData, beat);
 	}
 
 	return {
@@ -248,5 +257,6 @@ export default function useAudioMidiPlayer({
 		isPlaying,
 		getCurrentBeat,
 		correctAudioTimesPlayed,
+		playFromBeat,
 	};
 }

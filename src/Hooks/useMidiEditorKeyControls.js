@@ -7,6 +7,7 @@ export default function useMidiEditorKeyControls({
 	removeSelectedBeats,
 	commitSelectionMovement,
 	TOTAL_BEATS,
+	saveToJSONFile,
 }) {
 	const [timeDivision, setTimeDivision] = useState(32);
 	const [penModeActivated, setPenModeActivated] = useState(true);
@@ -75,7 +76,8 @@ export default function useMidiEditorKeyControls({
 			} else {
 				switch (event.key) {
 					case "s":
-						saveToLocalStorage();
+						// saveToLocalStorage();
+						saveToJSONFile();
 						break;
 					case "c":
 						// console.log("INCORRECT: ");

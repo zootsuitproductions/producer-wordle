@@ -1,7 +1,8 @@
 import React, { memo } from "react";
 import "../CSS/TopOfTimeline.css";
+import { useMidiContext } from "../Providers/MidiProvider";
 
-function TopOfTimeline({ width, timeDivision, height = 60 }) {
+function TopOfTimeline({ width, timeDivision, height = 60, onClick }) {
 	const getDisplayTime = (index) => {
 		const time = (8 * index) / timeDivision;
 		let displayTime = Math.floor(time) + 1;
@@ -25,10 +26,25 @@ function TopOfTimeline({ width, timeDivision, height = 60 }) {
 		return displayTime;
 	};
 
+	const { audioMidiPlayer } = useMidiContext();
+
+	const handleClick = (event) => {
+		const rect = event.target.getBoundingClientRect();
+		const parentRect = event.target.parentElement.getBoundingClientRect();
+		const x = event.clientX - parentRect.left; // x position within the element
+		const fraction = x / parentRect.width;
+		audioMidiPlayer.togglePlay(fraction * 16);
+	};
+
 	return (
-		<div className="Row-container" style={{ height: height }}>
+		<div
+			className="Row-container top-timeline-speaker"
+			style={{ height: height }}
+			onClick={handleClick}
+		>
 			{Array.from({ length: timeDivision / 2 }).map((_, index) =>
-				getDisplayTime(index) === "" ? null : (
+				getDisplayTime(index) ===
+				"" ? /*<div key={index} className="Time-marker-short"></div>*/ null : (
 					<div key={index} className="Time-marker">
 						{getDisplayTime(index)}
 					</div>

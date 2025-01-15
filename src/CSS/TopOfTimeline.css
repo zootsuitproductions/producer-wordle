@@ -21,3 +21,11 @@
     padding-left: 2px;
     /* z-index: 1; */
 }
+
+.top-timeline-wait {
+    cursor: wait; /* Wait cursor */
+}
+
+.top-timeline-speaker {
+	cursor: url('/public/speaker-24.ico') 10 16, auto; /* Adjust the size and position */
+}

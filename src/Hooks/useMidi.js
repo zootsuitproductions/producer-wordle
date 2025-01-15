@@ -1,6 +1,8 @@
 // useMidi.js
 import { useState, useEffect, useRef } from "react";
 import MidiNoteEvent from "../Models/MidiNoteEvent";
+import { saveAs } from "file-saver";
+import { getCorrectData } from "../Services/fallbackData";
 
 const useMidi = (keys) => {
 	const [keytracksData, setKeytracksData] = useState(keys.map(() => []));
@@ -16,6 +18,19 @@ const useMidi = (keys) => {
 			"correctMidiNoteEvents",
 			JSON.stringify(midiDataSorted)
 		);
+	}
+
+	function saveToJSONFile() {
+		const keytracksDataJson = JSON.stringify(keytracksData);
+		const midiDataSortedJson = JSON.stringify(midiDataSorted);
+
+		const blob = new Blob([keytracksDataJson], { type: "application/json" });
+		saveAs(blob, "correctData.json");
+
+		const blobSorted = new Blob([midiDataSortedJson], {
+			type: "application/json",
+		});
+		saveAs(blobSorted, "midiDataSorted.json");
 	}
 
 	useEffect(() => {
@@ -251,8 +266,20 @@ const useMidi = (keys) => {
 	}
 
 	const getKeytracksDataFromLocalStorage = () => {
-		const data = localStorage.getItem("correctData");
-		return data ? JSON.parse(data) : [];
+		// const data = localStorage.getItem("correctData");
+		return getCorrectData();
+		// return data ? JSON.parse(data) : [];
+	};
+
+	const getKeytracksDataFromFile = async () => {
+		try {
+			const response = await fetch("/correctData.json"); // Adjust the path
+			const data = await response.json();
+			return data;
+		} catch (error) {
+			console.error("Error loading JSON file:", error);
+			return [];
+		}
 	};
 
 	function checkForCorrectness() {
@@ -269,7 +296,7 @@ const useMidi = (keys) => {
 					for (let correctNoteEvent of correctKeytrack) {
 						if (noteEvent.startBeat === correctNoteEvent.startBeat) {
 							isCorrect = true;
-							endBeat = correctNoteEvent.endBeat;
+							// endBeat = correctNoteEvent.endBeat;
 							break;
 						}
 					}
@@ -341,6 +368,7 @@ const useMidi = (keys) => {
 		commitSelectionMovement,
 		numIncorrect,
 		getNumberOfNotesUserIsMissing,
+		saveToJSONFile,
 	};
 };
 

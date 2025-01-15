@@ -16,7 +16,7 @@ function PianoRoll({
 	const LEFT_PANEL_WIDTH = 130;
 	const KEY_WIDTH = 30;
 	return (
-		<div>
+		<div style={{ opacity: isDisplayingCorrect ? 0.8 : 1 }}>
 			<KeysColumn
 				keys={sampleFiles}
 				keyHeight={KEY_HEIGHT}

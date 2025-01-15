@@ -44,7 +44,8 @@ function PlaybackTools({
 	// Handler to toggle playback
 	const togglePlayback = (e) => {
 		e.target.blur(); // Remove focus from the button
-		audioMidiPlayer.togglePlay();
+		audioMidiPlayer.togglePlay(0);
+		// audioMidiPlayer.playFromBeat(4);
 	};
 
 	// Handler to toggle pen mode
@@ -62,6 +63,14 @@ function PlaybackTools({
 		//todo: make the notes turn green if they got it right
 		if (incorrectNotes === 0 && midi.getNumberOfNotesUserIsMissing() === 0) {
 			window.alert("You got it right in " + numMoves + " moves!");
+		} else {
+			window.alert(
+				"You got " +
+					incorrectNotes +
+					" notes wrong, and are missing " +
+					midi.getNumberOfNotesUserIsMissing() +
+					" notes."
+			);
 		}
 		setNumIncorrectNotes(incorrectNotes);
 	};

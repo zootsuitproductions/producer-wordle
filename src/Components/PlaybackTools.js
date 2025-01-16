@@ -8,6 +8,7 @@ function PlaybackTools({
 	setBpm,
 	isDisplayingCorrect,
 	setIsDisplayingCorrect,
+	MOVES_TO_WIN,
 }) {
 	const { midi, audioMidiPlayer, midiEditorKeyControls } = useMidiContext();
 	const [numMoves, setNumMoves] = useState(0);
@@ -58,11 +59,12 @@ function PlaybackTools({
 	const checkForCorrectness = (e) => {
 		e.target.blur(); // Remove focus from the button
 		const incorrectNotes = midi.checkForCorrectness();
+		const missingNotes = midi.getNumberOfNotesUserIsMissing();
 		midi.checkForCorrectness();
 
 		//todo: make the notes turn green if they got it right
-		if (incorrectNotes === 0 && midi.getNumberOfNotesUserIsMissing() === 0) {
-			if (numMoves <= 30) {
+		if (incorrectNotes === 0 && missingNotes === 0) {
+			if (numMoves <= MOVES_TO_WIN) {
 				window.alert("You got it right in " + numMoves + " moves! You win!");
 			} else {
 				window.alert(
@@ -75,9 +77,13 @@ function PlaybackTools({
 			window.alert(
 				"You got " +
 					incorrectNotes +
-					" notes wrong, and are missing " +
-					midi.getNumberOfNotesUserIsMissing() +
-					" notes."
+					" note" +
+					(incorrectNotes !== 1 ? "s" : "") +
+					" wrong, and are missing " +
+					missingNotes +
+					" note" +
+					(missingNotes !== 1 ? "s" : "") +
+					"."
 			);
 		}
 		setNumIncorrectNotes(incorrectNotes);
@@ -177,7 +183,7 @@ function PlaybackTools({
 				</button>
 
 				<button onClick={checkForCorrectness} className="check-button">
-					Check Correctness
+					Check Accuracy
 				</button>
 			</div>
 

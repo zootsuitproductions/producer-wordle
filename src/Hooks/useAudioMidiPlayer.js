@@ -143,7 +143,9 @@ export default function useAudioMidiPlayer({
 		noDrumsSource.current.playbackRate.value = playbackRate;
 
 		// Calculate the offset time in seconds
-		const offsetTime = (beatOffset / bpm) * 60;
+		const offsetTime = (beatOffset / originalBpm) * 60;
+
+		// const beatStartSeconds = ((beatOffset) * 60) / bpm;
 
 		console.log(playbackRate, offsetTime);
 		noDrumsSource.current.start(currentTime, offsetTime);

@@ -43,13 +43,15 @@ function App() {
 
 	const [bpm, setBpm] = useState(140);
 	const [noDrumsBpm] = useState(140);
-	const [isDisplayingCorrect, setIsDisplayingCorrect] = useState(false);
+	const [isDisplayingCorrect, setIsDisplayingCorrect] = useState(true);
 
 	const [correctData] = useState(() => {
 		// const storedData = localStorage.getItem("correctMidiNoteEvents");
 		return getCorrectMidiNoteEvents();
 		// return storedData ? JSON.parse() : []; // Default to an empty array
 	});
+
+	const MOVES_TO_WIN = 60;
 
 	const [penModeActive, setPenModeActive] = useState(false);
 
@@ -71,11 +73,16 @@ function App() {
 							background: "black",
 						}}
 					>
-						Draw in the drums from the Correct Beat in under 40 moves to win!
+						Draw in the drums from the Correct Beat in under {MOVES_TO_WIN}{" "}
+						moves to win!
 						<div style={{ fontSize: "12px", paddingTop: "5px" }}>
 							(Playing the Correct Beat constitutes 1 move, slowing the tempo
 							down counts as 5, and checking for correctness counts as 1 move
 							per note you get wrong)
+							<div>
+								You can play the beat from the middle by clicking the top of the
+								timeline at the desired position.
+							</div>
 						</div>
 					</h3>
 					<PlaybackTools
@@ -84,6 +91,7 @@ function App() {
 						isDisplayingCorrect={isDisplayingCorrect}
 						setIsDisplayingCorrect={setIsDisplayingCorrect}
 						penModeActive={penModeActive}
+						MOVES_TO_WIN={MOVES_TO_WIN}
 						setPenModeActive={setPenModeActive}
 					/>
 					<PianoRoll

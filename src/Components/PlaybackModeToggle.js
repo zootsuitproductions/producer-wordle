@@ -27,24 +27,27 @@ function PlaybackModeToggle({ isDisplayingCorrect, setIsDisplayingCorrect }) {
 				<div
 					className="toggle-border"
 					style={{
-						transform: isDisplayingCorrect
+						transform: !isDisplayingCorrect
 							? "translateX(100%)"
 							: "translateX(0)",
 					}}
 				></div>
-				<button
-					className={`toggle-button ${!isDisplayingCorrect ? "active" : ""}`}
-					onClick={() => handleModeChange("edit")}
-				>
-					Your Pattern
-				</button>
+
 				<button
 					className={`toggle-button correct-beat-button ${
 						isDisplayingCorrect ? "active" : ""
-					} ${isFirstClick ? "pulse-animation" : ""}`}
+					} `}
 					onClick={() => handleModeChange("listen")}
 				>
 					Correct Beat
+				</button>
+				<button
+					className={`toggle-button ${!isDisplayingCorrect ? "active" : ""} ${
+						isFirstClick ? "pulse-animation" : ""
+					}`}
+					onClick={() => handleModeChange("edit")}
+				>
+					Your Pattern
 				</button>
 			</div>
 		</>

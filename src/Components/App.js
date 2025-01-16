@@ -25,12 +25,13 @@ function App() {
 			// 	return `end of the road boyz samples/${name}`;
 			// });
 			const sampleNames = [
-				"_ Perc.wav",
-				"_ Clap.wav",
-				"_ Snare.wav",
-				"_ Open Hat.wav",
-				"_ Hat8.wav",
-				"_ Hat4.wav",
+				"Kick.wav",
+				"Perc.wav",
+				"Clap.wav",
+				"Snare.wav",
+				"Open Hat.wav",
+				"Hi Hat.wav",
+				"Low Hat.wav",
 			];
 			const samples = sampleNames.map((name) => {
 				return `hood_vamp/${name}`;

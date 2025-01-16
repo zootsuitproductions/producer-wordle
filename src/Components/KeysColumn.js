@@ -46,18 +46,6 @@ function KeysColumn({ keys, keyWidth, keyPlusSampleWidth = 200, keyHeight }) {
 					textAlign: "left",
 					backgroundColor: "#3F3F3F",
 				}}
-				onMouseDown={() => {
-					audioMidiPlayer.playMidiNoteInstantly({
-						note: i,
-						startBeat: 0,
-						endBeat: 15.75,
-						velocity: 0.9,
-						correct: true,
-						id: -1,
-						selected: false,
-					});
-					// alert("pressed");
-				}}
 			>
 				<div
 					style={{
@@ -70,7 +58,22 @@ function KeysColumn({ keys, keyWidth, keyPlusSampleWidth = 200, keyHeight }) {
 				>
 					{getFileNameFromPath(keys[i])}
 				</div>
-				<div key={i} style={style}></div>
+				<div
+					key={i}
+					style={style}
+					onMouseDown={() => {
+						audioMidiPlayer.playMidiNoteInstantly({
+							note: i,
+							startBeat: 0,
+							endBeat: 15.75,
+							velocity: 0.9,
+							correct: true,
+							id: -1,
+							selected: false,
+						});
+						// alert("pressed");
+					}}
+				></div>
 			</div>
 		);
 	}

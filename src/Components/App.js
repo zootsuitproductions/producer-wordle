@@ -30,8 +30,8 @@ function App() {
 				"Clap.wav",
 				"Snare.wav",
 				"Open Hat.wav",
+				"Lo Hat.wav",
 				"Hi Hat.wav",
-				"Low Hat.wav",
 			];
 			const samples = sampleNames.map((name) => {
 				return `hood_vamp/${name}`;

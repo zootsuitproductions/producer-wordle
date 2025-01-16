@@ -4,6 +4,8 @@ import { isBlackKey } from "../Services/utils";
 import "../CSS/KeysColumn.css";
 import TopOfTimeline from "./TopOfTimeline";
 import TopLeftKeyboardPanel from "./TopLeftKeyboardPanel";
+import useAudioMidiPlayer from "../Hooks/useAudioMidiPlayer";
+import { useMidiContext } from "../Providers/MidiProvider";
 
 function KeysColumn({ keys, keyWidth, keyPlusSampleWidth = 200, keyHeight }) {
 	var keysDisplay = [];
@@ -23,6 +25,8 @@ function KeysColumn({ keys, keyWidth, keyPlusSampleWidth = 200, keyHeight }) {
 		// return fileName;
 	}
 
+	const { audioMidiPlayer } = useMidiContext();
+
 	for (let i = keys.length - 1; i >= 0; i--) {
 		const style = {
 			width: keyWidth + "px",
@@ -41,6 +45,18 @@ function KeysColumn({ keys, keyWidth, keyPlusSampleWidth = 200, keyHeight }) {
 					width: keyPlusSampleWidth + "px",
 					textAlign: "left",
 					backgroundColor: "#3F3F3F",
+				}}
+				onMouseDown={() => {
+					audioMidiPlayer.playMidiNoteInstantly({
+						note: i,
+						startBeat: 0,
+						endBeat: 15.75,
+						velocity: 0.9,
+						correct: true,
+						id: -1,
+						selected: false,
+					});
+					// alert("pressed");
 				}}
 			>
 				<div

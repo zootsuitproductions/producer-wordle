@@ -266,5 +266,6 @@ export default function useAudioMidiPlayer({
 		getCurrentBeat,
 		correctAudioTimesPlayed,
 		playFromBeat,
+		playMidiNoteInstantly,
 	};
 }

@@ -9,21 +9,10 @@ import { MidiProvider } from "../Providers/MidiProvider";
 import { getCorrectMidiNoteEvents } from "../Services/fallbackData";
 
 function App() {
-	//todo this is bad
 	const [sampleFiles, setSampleFiles] = useState(null);
 	//on itialization, load all samples into an array from a folder in public called end of the road boys samples
 	useEffect(() => {
 		const loadSamples = async () => {
-			// const sampleNames = [
-			// 	"Hi Hat.wav",
-			// 	"Kick.wav",
-			// 	"Low Hat.wav",
-			// 	"Snare Hi.wav",
-			// 	"Snare.wav",
-			// ];
-			// const samples = sampleNames.map((name) => {
-			// 	return `end of the road boyz samples/${name}`;
-			// });
 			const sampleNames = [
 				"Kick.wav",
 				"Perc.wav",
@@ -47,9 +36,7 @@ function App() {
 	const [isDisplayingCorrect, setIsDisplayingCorrect] = useState(true);
 
 	const [correctData] = useState(() => {
-		// const storedData = localStorage.getItem("correctMidiNoteEvents");
 		return getCorrectMidiNoteEvents();
-		// return storedData ? JSON.parse() : []; // Default to an empty array
 	});
 
 	const MOVES_TO_WIN = 60;

@@ -1,22 +1,3 @@
-    DONE:
-    #0 correcting should move the end point to the correct spot
-    //fix samples bug,
-
-    //add scrubbing in the timeline
-
-    IN PROGRESS:
-    #1 - add erasing notes with pen --- need to add removing notes from start to end time. same with penning in
-    (to avoid random gaps from going too fast, also odd /back beats that dont align with current grid)
-
-    TODO:
-
-    playing the drums should just use the correct solution and play midi. so we dont need another file
-
-    #2 clicking and dragging notes. doesnt erase the ones under until releasing
-    #3 slider to adjust stems volume. the correct track should have the exact drum volumes that u can get
-        in the editor
-    #4 playback at specific points1
-
-
-    //need to add undo, selecting, moving with arrow keys
-    link to an api
+Todo:
+- add clipboard functionality
+- add undo / redo

@@ -2,6 +2,8 @@
 
 Producer Wordle is a web application that allows users to recreate drum patterns by drawing them on a piano roll interface. The goal is to match the correct drum pattern within a limited number of moves. The application provides tools for playback, editing, and checking the accuracy of the recreated drum pattern.
 
+Demo: https://producer-wordle.onrender.com/
+
 ## Features
 - **Piano Roll Interface**: Draw drum patterns on a piano roll.
 - **Playback Controls**: Play, pause, and adjust the tempo of the drum pattern.
